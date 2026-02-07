@@ -1,0 +1,1190 @@
+/* ===================================
+   Site Header (Homepage Style)
+   =================================== */
+.site-header {
+    background: #1a1a1a;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Prevent site-header from changing in dark mode */
+[data-theme="dark"] .site-header {
+    background: #1a1a1a !important;
+}
+
+
+.site-header__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.site-header__logo-link {
+    display: flex;
+    align-items: center;
+}
+
+.site-header__logo {
+    height: 60px;
+    width: auto;
+}
+
+.site-nav {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.site-nav__link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.site-nav__link:hover {
+    color: #0693e3;
+    transform: translateY(-2px);
+}
+
+.site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Tool Title Section */
+.tool-title-section {
+    background: var(--bg-primary, #fff);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    border-bottom: 2px solid var(--border-primary, #ddd);
+}
+
+.tool-title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a1a);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.2;
+}
+
+.tool-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary, #666);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Responsive Site Header */
+@media (max-width: 768px) {
+    .site-header__container {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .site-nav {
+        width: 100%;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .site-header__actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tool-title {
+        font-size: 1.5rem;
+    }
+
+    .tool-subtitle {
+        font-size: 0.95rem;
+    }
+}
+
+
+
+/* =====================================================
+   PIERCING ANGLE & DEPTH GUIDE - PROFESSIONAL STYLES
+   Poli International Tool #15
+   Following SKILL.md Standards (Sections 3-13)
+   ===================================================== */
+
+/* =====================================================
+   CSS CUSTOM PROPERTIES (SECTION 3.1 - REQUIRED)
+   ===================================================== */
+
+:root {
+  /* Tool-Specific Colors (Professional Purple/Violet Theme) */
+  --primary-color: #8B5CF6;          /* Violet primary */
+  --secondary-color: #7C3AED;        /* Deep purple secondary */
+
+  /* Universal Colors (DO NOT CHANGE) */
+  --kofi-red: #FF5E5B;
+  --ink-black: #1A1A1A;
+
+  /* Backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8FAFC;
+  --bg-tertiary: #F1F5F9;
+  --bg-card: #FFFFFF;
+
+  /* Text Colors */
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  /* Borders */
+  --border-primary: #E2E8F0;
+  --border-secondary: #CBD5E1;
+  --border-accent: var(--primary-color);
+
+  /* Status Colors */
+  --success-green: #10B981;
+  --warning-yellow: #F59E0B;
+  --error-red: #EF4444;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border Radius */
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --transition: all 0.3s ease;
+  --transition-fast: all 0.15s ease;
+}
+
+/* Dark Mode Variables (REQUIRED) */
+body.dark-mode {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-tertiary: #334155;
+  --bg-card: #1E293B;
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+
+  --border-primary: #334155;
+  --border-secondary: #475569;
+}
+
+/* =====================================================
+   BASE STYLES
+   ===================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 16px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Technical Background Pattern (Optional but Professional) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.piercing-angle-guide {
+  position: relative;
+  z-index: 1;
+}
+
+/* =====================================================
+   HEADER COMPONENT (SECTION 5 - REQUIRED)
+   ===================================================== */
+
+.piercing-angle-guide__header {
+  padding: var(--spacing-lg) var(--spacing-md);
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  border-bottom: 3px solid var(--primary-color);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.piercing-angle-guide__header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+/* Logo */
+.piercing-angle-guide__logo {
+  height: 40px; /* MANDATORY SIZE */
+  width: auto;
+  /* Removed filter - logo displays naturally on gradient background */
+}
+
+/* Title Group */
+.piercing-angle-guide__title-group {
+  text-align: center;
+}
+
+.piercing-angle-guide__header-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.piercing-angle-guide__header-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  margin: 4px 0 0 0;
+  line-height: 1.3;
+}
+
+/* Header Buttons */
+.piercing-angle-guide__header-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.piercing-angle-guide__embed-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: white;
+  color: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+}
+
+.piercing-angle-guide__embed-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.piercing-angle-guide__dark-mode-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1.2rem;
+}
+
+.piercing-angle-guide__dark-mode-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Ko-fi Button */
+.piercing-angle-guide__kofi-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: #FF5E5B;
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.piercing-angle-guide__kofi-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: #FF4E4B;
+}
+
+.kofi-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.kofi-text {
+  white-space: nowrap;
+}
+
+/* =====================================================
+   MAIN CONTENT AREA
+   ===================================================== */
+
+.piercing-angle-guide__main {
+  padding: var(--spacing-xl) var(--spacing-md);
+  min-height: calc(100vh - 400px);
+}
+
+.piercing-angle-guide__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* =====================================================
+   PROFESSIONAL WARNING (EMPHASIZED)
+   ===================================================== */
+
+.professional-warning {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  border: 4px solid #991B1B;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  box-shadow: var(--shadow-xl);
+  animation: pulse-warning 3s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+}
+
+.professional-warning__icon {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.professional-warning__content {
+  flex: 1;
+}
+
+.professional-warning__title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.professional-warning__text {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: var(--spacing-md);
+}
+
+.professional-warning__text:last-child {
+  margin-bottom: 0;
+}
+
+.professional-warning__text strong {
+  color: white;
+  font-weight: 700;
+}
+
+/* =====================================================
+   TOOL INTRODUCTION
+   ===================================================== */
+
+.tool-intro {
+  background: var(--bg-card);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  box-shadow: var(--shadow-md);
+}
+
+.tool-intro__title {
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.tool-intro__description {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+/* =====================================================
+   PIERCING SELECTOR
+   ===================================================== */
+
+.piercing-selector {
+  background: var(--bg-card);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  box-shadow: var(--shadow-md);
+}
+
+.piercing-selector__title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+}
+
+.piercing-categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.piercing-category__title {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.piercing-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.piercing-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.piercing-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.piercing-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--secondary-color);
+  box-shadow: var(--shadow-lg);
+}
+
+/* =====================================================
+   PIERCING DETAILS DISPLAY
+   ===================================================== */
+
+.piercing-details {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.piercing-details__title {
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 3px solid var(--primary-color);
+}
+
+.details-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.details-card--warning {
+  border-color: var(--warning-yellow);
+  background: linear-gradient(to right, var(--bg-card) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.details-card--danger {
+  border-color: var(--error-red);
+  background: linear-gradient(to right, var(--bg-card) 0%, rgba(239, 68, 68, 0.05) 100%);
+}
+
+.details-card__title {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.spec-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--primary-color);
+}
+
+.spec-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.spec-value {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.positioning-content,
+.safety-content,
+.refuse-content,
+.aftercare-content {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.positioning-content p,
+.safety-content p,
+.refuse-content p,
+.aftercare-content p {
+  margin-bottom: var(--spacing-md);
+}
+
+.positioning-content ul,
+.safety-content ul,
+.refuse-content ul,
+.aftercare-content ul {
+  margin-left: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.positioning-content li,
+.safety-content li,
+.refuse-content li,
+.aftercare-content li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.positioning-content strong,
+.safety-content strong,
+.refuse-content strong,
+.aftercare-content strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* =====================================================
+   GUIDE SECTIONS (SEO CONTENT)
+   ===================================================== */
+
+.guide-section {
+  background: var(--bg-card);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.guide-section__title {
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--border-accent);
+}
+
+.guide-section__text {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: var(--spacing-md);
+}
+
+.guide-section__text:last-child {
+  margin-bottom: 0;
+}
+
+/* =====================================================
+   FAQ SECTION
+   ===================================================== */
+
+.faq-item {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.faq-question {
+  color: var(--text-primary);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.faq-answer {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+/* =====================================================
+   RELATED TOOLS (INTERNAL LINKING)
+   ===================================================== */
+
+.related-tools {
+  background: var(--bg-card);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  box-shadow: var(--shadow-md);
+}
+
+.related-tools__title {
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.related-tools__intro {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+}
+
+.related-tools__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.related-tool-card {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  text-decoration: none;
+  transition: var(--transition);
+  display: block;
+}
+
+.related-tool-card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.related-tool-card--primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  border-color: var(--secondary-color);
+}
+
+.related-tool-card--primary .related-tool-card__title,
+.related-tool-card--primary .related-tool-card__description {
+  color: white;
+}
+
+.related-tool-card__title {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+}
+
+.related-tool-card__description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* =====================================================
+   FOOTER COMPONENT (SECTION 6 - REQUIRED)
+   ===================================================== */
+
+.piercing-angle-guide__footer {
+  background: var(--bg-primary);
+  border-top: 3px solid var(--primary-color);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
+  text-align: center;
+}
+
+.piercing-angle-guide__footer-logo-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.piercing-angle-guide__footer-logo {
+  height: 60px; /* MANDATORY SIZE */
+  width: auto;
+  margin: 0 auto;
+}
+
+.piercing-angle-guide__support-section {
+  margin-top: var(--spacing-lg);
+}
+
+.piercing-angle-guide__support-text {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.piercing-angle-guide__kofi {
+  display: inline-block;
+}
+
+.piercing-angle-guide__kofi-img {
+  height: 45px; /* MANDATORY SIZE */
+  transition: var(--transition);
+}
+
+.piercing-angle-guide__kofi-img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.piercing-angle-guide__copyright,
+.piercing-angle-guide__disclaimer {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.piercing-angle-guide__disclaimer {
+  font-style: italic;
+}
+
+/* =====================================================
+   EMBED MODAL (SECTION 8 - REQUIRED)
+   ===================================================== */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: var(--bg-primary);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+  box-shadow: var(--shadow-xl);
+}
+
+.modal-content h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.modal-content p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.modal-close {
+  position: absolute;
+  right: var(--spacing-lg);
+  top: var(--spacing-lg);
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--text-secondary);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+}
+
+#embedCode {
+  width: 100%;
+  min-height: 100px;
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: monospace;
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.copy-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.copy-btn:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN (SECTION 10)
+   ===================================================== */
+
+/* Mobile (< 768px) */
+@media (max-width: 768px) {
+  .piercing-angle-guide__header-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: var(--spacing-md);
+  }
+
+  .piercing-angle-guide__logo-container {
+    order: -1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .piercing-angle-guide__header-buttons {
+    justify-content: center;
+  }
+
+  .piercing-angle-guide__header-title {
+    font-size: 1.25rem;
+  }
+
+  .piercing-angle-guide__header-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .professional-warning {
+    flex-direction: column;
+    padding: var(--spacing-lg);
+  }
+
+  .professional-warning__icon {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .professional-warning__title {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .piercing-buttons {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .spec-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .piercing-details__title {
+    font-size: 1.5rem;
+  }
+
+  .guide-section__title {
+    font-size: 1.4rem;
+  }
+
+  .feedback-title {
+    font-size: 1.5rem;
+  }
+
+  .feedback-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .related-tools__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .piercing-buttons {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .spec-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =====================================================
+   PRINT STYLES
+   ===================================================== */
+
+@media print {
+  body::before {
+    display: none;
+  }
+
+  .piercing-angle-guide__header-buttons,
+  .piercing-angle-guide__embed-button,
+  .piercing-angle-guide__dark-mode-toggle,
+  .community-feedback,
+  .piercing-angle-guide__support-section,
+  .modal {
+    display: none !important;
+  }
+
+  .piercing-angle-guide__header {
+    position: static;
+    border-bottom: 2px solid #000;
+  }
+
+  .piercing-angle-guide__footer {
+    border-top: 2px solid #000;
+  }
+}
+
+/* =====================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ===================================================== */
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* Lock tool header colors in dark mode */
+[data-theme="dark"] .header,
+[data-theme="dark"] [class*="__header"] {
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+
+/* ===================================
+   Feedback Card (Standardized)
+   =================================== */
+.feedback-card {
+  background: var(--bg-primary);
+  border-radius: var(--border-radius-lg, 12px);
+  padding: var(--spacing-xl, 2.5rem);
+  box-shadow: var(--shadow-lg, 0 4px 20px rgba(0, 0, 0, 0.1));
+  max-width: 900px;
+  margin: 0 auto;
+  border: 3px solid #9b51e0;
+}
+
+/* Dark mode - subtle border */
+[data-theme="dark"] .feedback-card {
+  border: 2px solid var(--border-primary);
+}
+
+.feedback-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl, 2.5rem);
+}
+
+.feedback-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md, 1.5rem);
+  line-height: 1.2;
+}
+
+.feedback-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-md, 1.5rem);
+}
+
+.feedback-callout {
+  background: var(--bg-secondary);
+  padding: var(--spacing-md, 1.5rem);
+  border-radius: var(--border-radius, 8px);
+  border-left: 4px solid var(--artist-purple, #9b51e0);
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-top: var(--spacing-md, 1.5rem);
+}
+
+.feedback-callout strong {
+  color: var(--artist-purple, #9b51e0);
+}
+
+/* Form Styles */
+.feedback-form {
+  margin-top: var(--spacing-lg, 2rem);
+}
+
+.feedback-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg, 2rem);
+  margin-bottom: var(--spacing-lg, 2rem);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 0.5rem);
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: var(--spacing-sm, 1rem) var(--spacing-md, 1.5rem);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--border-radius, 8px);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: var(--transition, all 0.3s);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--artist-purple, #9b51e0);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .feedback-card {
+    padding: var(--spacing-lg, 2rem);
+  }
+
+  .feedback-title {
+    font-size: 1.5rem;
+  }
+
+  .feedback-subtitle {
+    font-size: 1rem;
+  }
+
+  .feedback-form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md, 1.5rem);
+  }
+}
