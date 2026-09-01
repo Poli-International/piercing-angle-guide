@@ -133,7 +133,6 @@
   --secondary-color: #7C3AED;        /* Deep purple secondary */
 
   /* Universal Colors (DO NOT CHANGE) */
-  --kofi-red: #FF5E5B;
   --ink-black: #1A1A1A;
 
   /* Backgrounds */
@@ -335,37 +334,13 @@ body::before {
   transform: scale(1.05);
 }
 
-/* Ko-fi Button */
-.piercing-angle-guide__kofi-button {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  background: #FF5E5B;
-  color: white;
-  border: none;
-  border-radius: var(--border-radius);
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  font-size: 0.9rem;
-  text-decoration: none;
-}
+/
 
-.piercing-angle-guide__kofi-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  background: #FF4E4B;
-}
 
-.kofi-icon {
-  font-size: 1.1rem;
-  line-height: 1;
-}
 
-.kofi-text {
-  white-space: nowrap;
-}
+
+
+
 
 /* =====================================================
    MAIN CONTENT AREA
@@ -811,19 +786,11 @@ body::before {
   margin-bottom: var(--spacing-md);
 }
 
-.piercing-angle-guide__kofi {
-  display: inline-block;
-}
 
-.piercing-angle-guide__kofi-img {
-  height: 45px; /* MANDATORY SIZE */
-  transition: var(--transition);
-}
 
-.piercing-angle-guide__kofi-img:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-}
+
+
+
 
 .piercing-angle-guide__copyright,
 .piercing-angle-guide__disclaimer {
