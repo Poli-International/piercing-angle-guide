@@ -2155,7 +2155,12 @@ Reference: Poli International Piercing Angle & Depth Guide`;
 
     // Dynamic re-render on language change
     window.addEventListener('languageChanged', function () {
+      // selectPiercing resets the visualizer; a language switch must keep the user's angle and thickness.
+      var keepAngle = currentVisualizerAngle, keepThickness = currentMeasuredThickness;
       selectPiercing(activePiercingKey, false);
+      currentVisualizerAngle = keepAngle;
+      currentMeasuredThickness = keepThickness;
+      updateVisualizerAndCalculations();
       populateCompareSelects();
       if (isCompareMode) {
         updateCompareWorkspace();
