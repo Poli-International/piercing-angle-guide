@@ -1,901 +1,2215 @@
-// =====================================================
-// PIERCING ANGLE & DEPTH GUIDE - MAIN LOGIC
-// Poli International Tool #15
-// Professional piercing reference data and interactive functionality
-// =====================================================
+/**
+ * Piercing Angle & Depth Guide - Interactive Clinical Controller
+ * Standards: ASTM F-136, ASTM F-138, ASTM F-67, BioFlex® body jewelry.
+ */
 
-// COMPREHENSIVE PIERCING DATA
-const piercingData = {
-  // ===== EAR PIERCINGS =====
-  'earlobe': {
-    name: 'Earlobe Piercing',
-    optimalAngle: '90° (perpendicular through lobe)',
-    insertionDepth: '6-8mm through soft tissue',
-    tissueType: 'Soft tissue (no cartilage)',
-    healingTime: '6-8 weeks',
-    jewelryGauge: '18g (1.0mm) or 16g (1.2mm) [14g (1.6mm) for stretching]',
-    jewelryLength: '6-8mm barbell or stud',
-    jewelryType: 'Labret stud, barbell, or CBR',
-    downsizeTime: '4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Center of lobe, avoiding edges and cartilage boundary. Mark with client in natural sitting position, not reclined.</p>
-      <p><strong>Anatomical Considerations:</strong> Assess lobe thickness with calipers. Avoid placing too close to face (minimum 6mm from edge) to prevent tearing. Consider glasses, headphones, and earbuds in placement.</p>
-      <p><strong>Angle Guidelines:</strong> Straight perpendicular angle ensures jewelry sits flush. Verify entry and exit points are level and centered.</p>`,
-    safety: `<ul>
-      <li><strong>Vascular Care:</strong> Avoid visible blood vessels, especially in thin lobes</li>
-      <li><strong>Scar Tissue:</strong> Never pierce through previous piercing scars or keloids</li>
-      <li><strong>Children:</strong> For minors, ensure parent/guardian consent and child cooperation</li>
-      <li><strong>Infection Risk:</strong> Low risk if proper aftercare followed; avoid touching with unwashed hands</li>
-      <li><strong>Stretching Considerations:</strong> If client plans to stretch, start with 14g minimum</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Active infection, eczema, or skin condition on earlobe</li>
-      <li>Extremely thin lobes (<3mm thickness) that won't support jewelry safely</li>
-      <li>Excessive scar tissue from previous piercings or trauma</li>
-      <li>Client requests placement too close to edge (increased tearing risk)</li>
-      <li>Visible keloid history on ears (high recurrence risk)</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Clean 2x daily with sterile saline spray. Spray, let sit 30 seconds, gently pat dry with clean gauze. No twisting or rotating jewelry.</p>
-      <p><strong>First 2 Weeks:</strong> Avoid sleeping on piercing, touching with unwashed hands, swimming pools, or submerging in water.</p>
-      <p><strong>Weeks 3-6:</strong> Continue cleaning routine, avoid changing jewelry before 6-8 weeks even if healed.</p>
-      <p><strong>Warning Signs:</strong> Excessive redness, swelling, heat, green/yellow discharge, or severe pain requires professional evaluation.</p>`
-  },
+(function () {
+  'use strict';
 
-  'helix': {
-    name: 'Helix Piercing',
-    optimalAngle: '70-80° following ear curve',
-    insertionDepth: '8-10mm through cartilage',
-    tissueType: 'Cartilage',
-    healingTime: '3-6 months',
-    jewelryGauge: '16g (1.2mm) or 14g (1.6mm)',
-    jewelryLength: '8-10mm labret stud',
-    jewelryType: 'Flat-back labret (initial), CBR after healed',
-    downsizeTime: '6-8 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Upper outer rim of ear cartilage. Assess natural curve and select flat area avoiding excessive curve or protruding sections.</p>
-      <p><strong>Anatomical Considerations:</strong> Cartilage thickness varies 2-4mm typically. Use calipers to measure. Avoid areas with prominent blood vessels (visible through cartilage with transillumination).</p>
-      <p><strong>Angle Guidelines:</strong> Follow natural curve of ear, typically 70-80 degrees. Angle ensures jewelry sits flush when healed, not protruding uncomfortably.</p>`,
-    safety: `<ul>
-      <li><strong>Avoid Piercing Gun:</strong> NEVER use piercing guns on cartilage - causes shattering and permanent damage</li>
-      <li><strong>Infection Risk:</strong> Cartilage infections are serious and can cause permanent deformity (cauliflower ear)</li>
-      <li><strong>Blood Vessels:</strong> Transilluminate ear to identify and avoid blood vessels</li>
-      <li><strong>Keloid Risk:</strong> Higher keloid risk in cartilage than soft tissue; screen clients carefully</li>
-      <li><strong>Trauma Risk:</strong> Warn about sleeping on piercing, snagging on hair/clothes during healing</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Previous cartilage piercing rejection or infection in same area</li>
-      <li>Active cellulitis or perichondritis on ear</li>
-      <li>Keloid history (especially on ears)</li>
-      <li>Extremely thin cartilage (<1.5mm) won't support jewelry</li>
-      <li>Client requests gun piercing (explain cartilage damage risk)</li>
-      <li>Immunosuppressive medications increasing infection risk</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Spray generously, let sit 1-2 minutes, rinse with clean water, pat dry. NEVER twist jewelry.</p>
-      <p><strong>First 3 Months:</strong> Absolutely no sleeping on piercing side. Use travel pillow or donut pillow if needed. Avoid headphones over piercing.</p>
-      <p><strong>Months 4-6:</strong> Continue cleaning if any crusties present. May begin carefully changing to shorter post after professional evaluation.</p>
-      <p><strong>Warning Signs:</strong> Persistent throbbing pain, excessive warmth, swelling spreading beyond piercing, or foul-smelling discharge requires immediate medical attention (cartilage infection risk).</p>`
-  },
+  // Global database references
+  var piercingData = (typeof window !== 'undefined' && window.PIERCING_DATA) || {};
+  var jewelryOptions = (typeof window !== 'undefined' && window.PIERCING_JEWELRY_OPTIONS) || {};
 
-  'forward-helix': {
-    name: 'Forward Helix Piercing',
-    optimalAngle: '75-85° through forward curve',
-    insertionDepth: '6-8mm through cartilage',
-    tissueType: 'Cartilage',
-    healingTime: '4-6 months',
-    jewelryGauge: '16g (1.2mm)',
-    jewelryLength: '6-8mm flat-back labret',
-    jewelryType: 'Flat-back labret stud',
-    downsizeTime: '8-10 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Front portion of helix, typically at curve where ear begins to fold forward. Location varies significantly by ear anatomy.</p>
-      <p><strong>Anatomical Considerations:</strong> This area has thinner cartilage than standard helix (3-5mm typically). Assess curve carefully - some clients lack adequate flat space for this piercing.</p>
-      <p><strong>Angle Guidelines:</strong> Must follow the natural forward curve to prevent jewelry protruding uncomfortably. Angle typically 75-85 degrees depending on individual ear shape.</p>`,
-    safety: `<ul>
-      <li><strong>Vascular Care:</strong> Higher blood vessel density in forward helix; always transilluminate before marking</li>
-      <li><strong>Headphones Risk:</strong> This piercing is incompatible with many over-ear headphones during healing</li>
-      <li><strong>Hair Snagging:</strong> Very high risk of snagging on hair, especially long hair - educate clients thoroughly</li>
-      <li><strong>Multiple Piercings:</strong> Popular for triples/doubles - space minimum 8mm apart to prevent migration</li>
-      <li><strong>Anatomical Limitations:</strong> Not all ears have suitable anatomy for forward helix placement</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient flat space on forward curve (ear too rounded or protruding)</li>
-      <li>Major blood vessel directly in desired placement location</li>
-      <li>Previous forward helix rejection or migration in same area</li>
-      <li>Client wears over-ear headphones daily and cannot switch to earbuds during healing</li>
-      <li>Active acne, cystic acne, or skin conditions in placement area</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2-3x daily. Access can be tricky - use clean hands to lift hair away, spray thoroughly, let sit, rinse with clean water in shower.</p>
-      <p><strong>Hair Management:</strong> Critical to keep hair away from piercing. Use clips, headbands, or tie hair back during healing. Avoid hair products on/near piercing.</p>
-      <p><strong>First 4 Months:</strong> No sleeping on that side, no over-ear headphones, extreme caution with hair brushing and styling.</p>
-      <p><strong>Warning Signs:</strong> Forward helix more prone to irritation bumps. Persistent bumps, excessive swelling, or heat requires professional evaluation.</p>`
-  },
+  // Dedicated Architecture Modules
+  var storage = (typeof window !== 'undefined' && window.PiercingStorageManager) || {};
+  var calculator = (typeof window !== 'undefined' && window.PiercingCalculator) || {};
+  var uiController = (typeof window !== 'undefined' && window.PiercingUIController) || {};
 
-  'tragus': {
-    name: 'Tragus Piercing',
-    optimalAngle: '90° horizontal through tragus',
-    insertionDepth: '6-8mm (varies with tragus size)',
-    tissueType: 'Cartilage (thicker than helix)',
-    healingTime: '3-6 months',
-    jewelryGauge: '16g (1.2mm)',
-    jewelryLength: '6-8mm flat-back labret',
-    jewelryType: 'Flat-back labret (initial), CBR after healed',
-    downsizeTime: '6-8 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Center of tragus cartilage, positioned horizontally. Entry point on front tragus face, exit in conch bowl area.</p>
-      <p><strong>Anatomical Considerations:</strong> Tragus size varies dramatically - assess if sufficient tissue exists (minimum 5mm width). Measure with calipers before committing. Some tragus are too small or thin for safe piercing.</p>
-      <p><strong>Angle Guidelines:</strong> Straight horizontal angle (90 degrees) ensures jewelry doesn't angle awkwardly into conch or protrude excessively outward.</p>`,
-    safety: `<ul>
-      <li><strong>Earbuds Incompatible:</strong> Cannot use earbuds during healing (3-6 months minimum)</li>
-      <li><strong>Hearing Aid Considerations:</strong> Incompatible with many hearing aids - screen carefully</li>
-      <li><strong>Thick Cartilage:</strong> Requires proper needle technique due to thickness and density</li>
-      <li><strong>Vascular Density:</strong> Transilluminate to avoid blood vessels in tragus</li>
-      <li><strong>Balance Issues:</strong> Some clients experience temporary balance sensitivity during healing</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Tragus too small (< 5mm width) or too thin (< 3mm thickness)</li>
-      <li>Client uses hearing aids that would conflict with piercing</li>
-      <li>Client cannot/will not avoid earbuds for 6+ months</li>
-      <li>Previous tragus rejection or severe reaction</li>
-      <li>Prominent blood vessel directly through desired placement</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Spray front and back, let sit, gently rinse. Do NOT rotate or move jewelry.</p>
-      <p><strong>Earbud Alternative:</strong> Use over-ear headphones or speakers during healing. NO earbuds until completely healed (6+ months).</p>
-      <p><strong>First 3 Months:</strong> Avoid sleeping on that side, be cautious with phones pressed to ear, no swimming.</p>
-      <p><strong>Warning Signs:</strong> Tragus prone to irritation bumps and swelling. Persistent issues, excessive pain, or suspected infection requires professional evaluation.</p>`
-  },
-
-  'anti-tragus': {
-    name: 'Anti-Tragus Piercing',
-    optimalAngle: '80-90° through anti-tragus fold',
-    insertionDepth: '5-7mm (often thinner tissue)',
-    tissueType: 'Cartilage',
-    healingTime: '4-9 months',
-    jewelryGauge: '16g (1.2mm)',
-    jewelryLength: '6-8mm curved barbell or labret',
-    jewelryType: 'Curved barbell or flat-back labret',
-    downsizeTime: '8-10 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Small cartilage ridge opposite the tragus, above earlobe. Anatomy varies significantly - not all ears have prominent anti-tragus.</p>
-      <p><strong>Anatomical Considerations:</strong> This is often the most challenging ear piercing due to anatomy variations. Anti-tragus may be very small, flat, or non-existent. Requires careful assessment before accepting client.</p>
-      <p><strong>Angle Guidelines:</strong> Angle must follow the natural fold, typically 80-90 degrees. Improper angle causes jewelry to sit awkwardly or increases rejection risk.</p>`,
-    safety: `<ul>
-      <li><strong>Difficult Piercing:</strong> Considered advanced due to anatomy challenges and access difficulty</li>
-      <li><strong>High Rejection Risk:</strong> Anti-tragus has higher rejection/migration rate than other ear piercings</li>
-      <li><strong>Prolonged Healing:</strong> Often takes 6-9+ months to fully heal, longer than most cartilage piercings</li>
-      <li><strong>Swelling Issues:</strong> Tends to swell significantly during healing due to location and movement</li>
-      <li><strong>Jewelry Pressure:</strong> Sleeping position and phone use creates constant pressure on this piercing</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient anti-tragus anatomy (flat or non-existent ridge)</li>
-      <li>Anti-tragus tissue too thin (< 4mm) to support jewelry safely</li>
-      <li>Previous anti-tragus rejection or migration</li>
-      <li>Client history of high rejection rates on other piercings</li>
-      <li>Client lifestyle involves frequent phone use against that ear during healing period</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Difficult location to reach - use clean hands to position jewelry for thorough cleaning front and back.</p>
-      <p><strong>First 4-6 Months:</strong> Absolutely no sleeping on that side. Minimize phone pressure against ear. Avoid headphones touching piercing area.</p>
-      <p><strong>Months 6-9:</strong> Continue monitoring even if appears healed. This piercing takes significantly longer than typical cartilage.</p>
-      <p><strong>Warning Signs:</strong> Anti-tragus very prone to irritation bumps, migration, and rejection. Any jewelry migration (getting closer to surface) requires immediate professional evaluation.</p>`
-  },
-
-  'conch': {
-    name: 'Conch Piercing',
-    optimalAngle: '90° through conch bowl',
-    insertionDepth: '8-12mm depending on conch depth',
-    tissueType: 'Cartilage',
-    healingTime: '3-9 months',
-    jewelryGauge: '14g (1.6mm) or 16g (1.2mm)',
-    jewelryLength: '8-12mm labret (measure carefully)',
-    jewelryType: 'Flat-back labret (initial), CBR/clicker after healed',
-    downsizeTime: '8-12 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Center of conch bowl (inner) or outer conch rim. Inner conch placement requires careful depth measurement as some conches are very deep.</p>
-      <p><strong>Anatomical Considerations:</strong> Conch depth varies 8-15mm between clients. MUST measure with calipers to select appropriate jewelry length. Insufficient length causes embedding; excessive length increases snagging risk.</p>
-      <p><strong>Angle Guidelines:</strong> Perpendicular (90 degrees) through conch ensures jewelry sits flush and comfortable. For inner conch going to outer ear, angle must account for ear curve.</p>`,
-    safety: `<ul>
-      <li><strong>Deep Piercing:</strong> One of the deeper ear piercings; requires appropriate needle length and technique</li>
-      <li><strong>Bleeding Risk:</strong> More vascular than outer ear cartilage; transilluminate and mark vessels before piercing</li>
-      <li><strong>Earbuds:</strong> Cannot use earbuds during healing (6-9 months)</li>
-      <li><strong>Swelling Significant:</strong> Conch swells substantially during healing; initial jewelry MUST accommodate swelling</li>
-      <li><strong>Phone Use:</strong> Phones pressed against conch during healing causes significant irritation</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Conch anatomy too shallow (< 6mm depth) for safe inner conch piercing</li>
-      <li>Major blood vessels in desired placement that cannot be avoided</li>
-      <li>Previous conch rejection, severe infection, or migration</li>
-      <li>Client uses earbuds daily and refuses to stop for healing period</li>
-      <li>Active ear infection or severe acne in conch area</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2-3x daily. Spray generously into conch bowl, let sit 1-2 minutes, rinse thoroughly in shower. Crusties can be stubborn in this location.</p>
-      <p><strong>First 6 Months:</strong> No sleeping on that side (critical for conch). No earbuds. Minimize phone pressure. Avoid hair products in ear.</p>
-      <p><strong>Downsizing Important:</strong> Schedule downsize appointment at 8-12 weeks. Long initial jewelry increases snagging and irritation risk once swelling resolves.</p>
-      <p><strong>Warning Signs:</strong> Persistent throbbing, excessive heat, swelling spreading beyond piercing site, or foul discharge requires immediate evaluation (cartilage infection risk high).</p>`
-  },
-
-  'rook': {
-    name: 'Rook Piercing',
-    optimalAngle: '85-90° through rook fold',
-    insertionDepth: '6-8mm through cartilage fold',
-    tissueType: 'Cartilage (thick fold)',
-    healingTime: '6-9 months',
-    jewelryGauge: '16g (1.2mm)',
-    jewelryLength: '8-10mm curved barbell',
-    jewelryType: 'Curved barbell (required for anatomy)',
-    downsizeTime: '10-12 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Through the ridge of cartilage in upper inner ear, the fold of tissue above the daith location. Anatomy highly variable.</p>
-      <p><strong>Anatomical Considerations:</strong> Rook anatomy varies dramatically between clients. Some lack prominent rook fold entirely. Requires very careful assessment - fold must be substantial enough (minimum 5mm height, 4mm thickness) to support jewelry safely.</p>
-      <p><strong>Angle Guidelines:</strong> Must pierce through both sides of the fold at appropriate angle (85-90 degrees typically) to ensure curved barbell sits correctly and comfortably.</p>`,
-    safety: `<ul>
-      <li><strong>Advanced Piercing:</strong> Considered advanced due to difficult anatomy, access challenges, and technique requirements</li>
-      <li><strong>Very Painful:</strong> Often rated as one of the most painful ear piercings due to thick, dense cartilage</li>
-      <li><strong>Prolonged Healing:</strong> Takes 6-9 months minimum, often longer; clients must commit to long healing period</li>
-      <li><strong>Swelling Significant:</strong> Rook swells substantially; initial jewelry must be long enough to prevent embedding</li>
-      <li><strong>Migration Risk:</strong> If anatomy insufficient or angle incorrect, higher migration/rejection risk</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient rook anatomy (fold too small, flat, or non-existent)</li>
-      <li>Rook fold too thin (< 4mm thickness) to safely support curved barbell</li>
-      <li>Previous rook rejection or severe migration</li>
-      <li>Client cannot commit to 9+ month healing period without changing jewelry</li>
-      <li>Severe keloid history on ears</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2-3x daily. Access difficult - use spray bottle to thoroughly saturate both sides of fold. Let sit 2-3 minutes, rinse in shower.</p>
-      <p><strong>First 6 Months:</strong> Absolutely no sleeping on that side. No touching, rotating, or moving jewelry. Avoid hair products near piercing.</p>
-      <p><strong>Long Healing:</strong> Expect full healing to take 9-12 months. Do not change jewelry until completely healed and evaluated by professional.</p>
-      <p><strong>Warning Signs:</strong> Rook prone to irritation bumps and prolonged swelling. Any signs of migration (jewelry getting shallower), persistent bumps, or severe pain requires professional evaluation.</p>`
-  },
-
-  'daith': {
-    name: 'Daith Piercing',
-    optimalAngle: '90° through daith fold',
-    insertionDepth: '8-10mm through thick cartilage fold',
-    tissueType: 'Cartilage (very thick fold)',
-    healingTime: '4-9 months',
-    jewelryGauge: '16g (1.2mm) or 14g (1.6mm)',
-    jewelryLength: 'N/A - circular jewelry required',
-    jewelryType: 'Captive bead ring or clicker',
-    downsizeTime: 'Diameter adjustment at 8-10 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Through the crus of helix - the innermost cartilage fold that the ear canal passes under. Precise location critical for aesthetic and healing.</p>
-      <p><strong>Anatomical Considerations:</strong> Daith anatomy varies significantly. Some ears lack distinct fold, others have very pronounced fold. Requires careful assessment - fold must be substantial (minimum 5mm wide, 5mm thick) to support jewelry. Measure depth carefully with calipers.</p>
-      <p><strong>Angle Guidelines:</strong> Perpendicular (90 degrees) through fold ensures circular jewelry sits correctly following natural curve. Entry and exit points must allow ring to hang properly in conch.</p>`,
-    safety: `<ul>
-      <li><strong>Advanced Technique:</strong> Difficult piercing requiring experience due to anatomy challenges and access difficulty</li>
-      <li><strong>Very Thick Cartilage:</strong> Daith fold is among thickest ear cartilage; requires appropriate needle gauge and technique</li>
-      <li><strong>Circular Jewelry Required:</strong> Must use CBR or clicker, cannot use straight jewelry</li>
-      <li><strong>Migraine Claims:</strong> No scientific evidence supports migraine relief; inform clients this is not proven medical treatment</li>
-      <li><strong>Prolonged Healing:</strong> Often takes 6-9+ months; very prone to irritation during healing</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient daith anatomy (fold too small, undefined, or flat)</li>
-      <li>Daith fold too thin (< 5mm) to safely support circular jewelry</li>
-      <li>Previous daith rejection, severe migration, or infection</li>
-      <li>Client believes it will cure migraines (educate about lack of scientific evidence; proceed only with informed consent)</li>
-      <li>Cannot commit to 9+ month healing period</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2-3x daily. Spray thoroughly around all sides of circular jewelry, let sit 2-3 minutes, rinse well in shower. Crusties accumulate on circular jewelry - be diligent about cleaning.</p>
-      <p><strong>First 6 Months:</strong> No sleeping on that side. Absolutely no rotating or moving the ring. Avoid earbuds (some clients can use with care after initial healing).</p>
-      <p><strong>Jewelry Considerations:</strong> Circular jewelry requires diligent cleaning. Consider smaller diameter after swelling resolves to reduce snagging risk.</p>
-      <p><strong>Warning Signs:</strong> Daith very prone to irritation bumps and prolonged healing issues. Persistent bumps, migration signs, or infection symptoms require immediate professional evaluation.</p>`
-  },
-
-  'industrial': {
-    name: 'Industrial Piercing',
-    optimalAngle: '75-85° through helix, 75-85° through forward helix',
-    insertionDepth: '8-10mm each piercing',
-    tissueType: 'Cartilage (two separate piercings)',
-    healingTime: '6-12 months',
-    jewelryGauge: '14g (1.6mm)',
-    jewelryLength: '35-45mm industrial barbell (measure carefully)',
-    jewelryType: 'Industrial barbell (must be fitted properly)',
-    downsizeTime: 'N/A - custom fit required from start',
-    positioning: `<p><strong>Optimal Placement:</strong> Two piercings (typically helix and forward helix) connected with single long barbell. CRITICAL: Piercings must be precisely aligned or jewelry will apply constant pressure causing migration/rejection.</p>
-      <p><strong>Anatomical Considerations:</strong> Most challenging ear piercing due to alignment requirements. NOT all ears have suitable anatomy - ear shape must allow straight line between intended points. Use straightedge to verify alignment before marking. Even slight misalignment causes major issues.</p>
-      <p><strong>Angle Guidelines:</strong> Both piercings must be angled so barbell passes through comfortably without pressure on either end. Requires advanced technique and experience.</p>`,
-    safety: `<ul>
-      <li><strong>Advanced Piercing:</strong> Should only be performed by experienced professionals with proven industrial piercing success</li>
-      <li><strong>Anatomy Critical:</strong> Majority of ears do NOT have suitable anatomy for industrial - refuse if alignment not perfect</li>
-      <li><strong>High Complication Rate:</strong> Industrial has higher complications than other ear piercings due to pressure, movement, and dual healing sites</li>
-      <li><strong>Very Long Healing:</strong> Takes 9-12+ months minimum; longest healing of all ear piercings</li>
-      <li><strong>Pressure Issues:</strong> Constant pressure from barbell frequently causes irritation, bumps, and migration</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Ear anatomy does not allow straight line between intended piercing points (misalignment will cause pressure and rejection)</li>
-      <li>Insufficient cartilage depth or width at either piercing point</li>
-      <li>Previous industrial rejection or severe migration</li>
-      <li>Client cannot avoid sleeping on that side for 12+ months</li>
-      <li>Inexperienced piercer (industrial requires advanced skills)</li>
-      <li>Client wears over-ear headphones daily and cannot stop during healing</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 3x daily on BOTH piercings. Clean thoroughly around barbell at both ends, let sit, rinse well. More maintenance than single piercing.</p>
-      <p><strong>First 9-12 Months:</strong> Absolutely NO sleeping on that side (non-negotiable). No headphones touching barbell. Extreme caution with hair, clothes, seatbelts.</p>
-      <p><strong>Irritation Common:</strong> Industrial almost always develops irritation bumps during healing due to movement and pressure. Most resolve with proper care and downsizing if needed.</p>
-      <p><strong>Warning Signs:</strong> Signs of migration at either end (jewelry getting shallower), persistent severe pain, or infection requires immediate professional evaluation. May need to remove barbell and let heal, then re-evaluate anatomy.</p>`
-  },
-
-  // ===== FACIAL PIERCINGS =====
-  'nostril': {
-    name: 'Nostril Piercing',
-    optimalAngle: '45-60° through nostril curve',
-    insertionDepth: '8-10mm through cartilage and mucosa',
-    tissueType: 'Cartilage + mucosal membrane',
-    healingTime: '2-4 months',
-    jewelryGauge: '18g (1.0mm) or 16g (1.2mm)',
-    jewelryLength: '6-8mm labret stud',
-    jewelryType: 'Labret stud (initial), can change to L-bend or hoop after healed',
-    downsizeTime: '4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Crease of nostril where it curves, typically aligned with center or outer edge of nostril. Placement is aesthetic preference but must accommodate anatomy.</p>
-      <p><strong>Anatomical Considerations:</strong> Nostril cartilage thickness varies 1-3mm. Must angle through cartilage curve to emerge properly inside nose without hitting septum or outer nostril edge. Mark carefully with client sitting upright, neutral expression.</p>
-      <p><strong>Angle Guidelines:</strong> 45-60 degree angle necessary to navigate cartilage curve while keeping jewelry flush against nostril. Too steep or shallow causes jewelry to protrude awkwardly.</p>`,
-    safety: `<ul>
-      <li><strong>Vascular Area:</strong> Transilluminate nostril to identify blood vessels; nostril has significant blood supply</li>
-      <li><strong>Allergies/Colds:</strong> Healing complicated by allergies, colds, or sinus issues - screen clients for chronic issues</li>
-      <li><strong>Bumps Common:</strong> Nostril piercings prone to irritation bumps (not keloids); usually resolve with proper care</li>
-      <li><strong>Jewelry Type Critical:</strong> L-bends and nose screws migrate frequently during healing; flat-back labret studs strongly preferred initially</li>
-      <li><strong>Makeup Contamination:</strong> Must avoid makeup on/around piercing during healing</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Active sinus infection, severe chronic allergies, or frequent nosebleeds</li>
-      <li>Severely deviated septum causing nostril asymmetry or breathing issues</li>
-      <li>Prominent blood vessels that cannot be avoided in desired placement</li>
-      <li>Scar tissue from previous nostril piercings that hasn't fully healed</li>
-      <li>Client requests gun piercing (explain cartilage damage risk, offer alternative)</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2-3x daily externally. Spray inside nostril and outside, let sit, gently blow nose to clear, pat dry. NO twisting or rotating.</p>
-      <p><strong>First 2 Months:</strong> Avoid makeup near piercing, no swimming, careful nose blowing, no changing jewelry. Keep hands clean when touching nose.</p>
-      <p><strong>Irritation Bumps:</strong> Very common on nostril piercings. Usually caused by movement, makeup, or trauma. Maintain cleaning routine; most resolve in 4-8 weeks.</p>
-      <p><strong>Warning Signs:</strong> Excessive swelling, severe pain, or signs of infection (heat, green discharge) require professional evaluation. Some irritation and occasional bumps are normal.</p>`
-  },
-
-  'septum': {
-    name: 'Septum Piercing',
-    optimalAngle: '90° perpendicular through sweet spot',
-    insertionDepth: '10-12mm through soft tissue',
-    tissueType: 'Soft tissue membrane (sweet spot), NOT cartilage',
-    healingTime: '6-8 weeks',
-    jewelryGauge: '16g (1.2mm) or 14g (1.6mm)',
-    jewelryLength: 'N/A - circular jewelry',
-    jewelryType: 'Circular barbell or CBR',
-    downsizeTime: 'Diameter adjustment at 4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Must be through "sweet spot" - thin membrane of soft tissue between cartilage and columella (bottom of nose). Sweet spot location varies significantly between clients.</p>
-      <p><strong>Anatomical Considerations:</strong> CRITICAL: Never pierce through cartilage - only through sweet spot soft tissue. Sweet spot may be very small, off-center, high, or low depending on anatomy. Some clients lack adequate sweet spot for piercing. Always palpate thoroughly to locate exact position.</p>
-      <p><strong>Angle Guidelines:</strong> Perpendicular (90 degrees) ensures jewelry hangs evenly and symmetrically. Must pierce straight through or jewelry will sit crooked.</p>`,
-    safety: `<ul>
-      <li><strong>Sweet Spot Verification:</strong> MUST palpate and verify soft tissue location before piercing - NEVER pierce cartilage</li>
-      <li><strong>Deviated Septum:</strong> Very common; may cause sweet spot to be off-center or very small</li>
-      <li><strong>Visibility Option:</strong> Can be hidden by flipping jewelry up into nose; verify client understands size needed for hiding</li>
-      <li><strong>Allergy/Cold Issues:</strong> Healing complicated by allergies, sinus issues, colds</li>
-      <li><strong>If Cartilage Pierced:</strong> Extremely painful, prolonged healing (6-12 months), high complications - avoid at all costs</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>No identifiable sweet spot (too small, non-existent, or entirely cartilage)</li>
-      <li>Active severe sinus infection or frequent chronic infections</li>
-      <li>Deviated septum so severe sweet spot cannot be safely accessed</li>
-      <li>Scar tissue from previous septum piercing preventing safe access to sweet spot</li>
-      <li>Client expectations for placement cannot be met safely with their anatomy</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Spray inside both nostrils, flip jewelry down to clean both sides if applicable, rinse, gently blow nose to clear.</p>
-      <p><strong>First 6-8 Weeks:</strong> Avoid touching, flipping up and down frequently (if hiding, choose position and leave it), no swimming, careful nose blowing.</p>
-      <p><strong>Healing Note:</strong> Septum through sweet spot heals faster than cartilage piercings (6-8 weeks typically). Minimal pain if pierced correctly through soft tissue.</p>
-      <p><strong>Warning Signs:</strong> Severe pain suggests cartilage may have been pierced - seek professional evaluation. Excessive swelling, heat, or bleeding requires immediate attention.</p>`
-  },
-
-  'bridge': {
-    name: 'Bridge Piercing',
-    optimalAngle: '90° horizontal across bridge of nose',
-    insertionDepth: '5-7mm surface piercing depth',
-    tissueType: 'Soft tissue + minimal cartilage',
-    healingTime: '8-12 weeks',
-    jewelryGauge: '14g (1.6mm) or 12g (2.0mm) (surface bars)',
-    jewelryLength: 'Custom surface bar 12-18mm',
-    jewelryType: 'Surface barbell (90° bends)',
-    downsizeTime: 'N/A - custom fitted from start',
-    positioning: `<p><strong>Optimal Placement:</strong> Horizontal across bridge of nose, typically between eyes at brow line level. Aesthetic placement highly variable by face structure.</p>
-      <p><strong>Anatomical Considerations:</strong> Bridge piercing is technically a surface piercing with some cartilage involvement. Requires adequate tissue "pinch-ability" on nose bridge (minimum 7mm pinch). Tissue must be substantial enough to support surface bar without rejection risk.</p>
-      <p><strong>Angle Guidelines:</strong> Must be perfectly horizontal and parallel to face. Surface bars with 90-degree bends required to minimize pressure and rejection risk.</p>`,
-    safety: `<ul>
-      <li><strong>Surface Piercing:</strong> High rejection/migration risk like all surface piercings; only pierce if adequate tissue depth</li>
-      <li><strong>Glasses Incompatibility:</strong> Cannot wear glasses during healing (12+ weeks minimum); contact lenses required</li>
-      <li><strong>Facial Movement:</strong> Significant facial movement during eating, talking increases migration risk</li>
-      <li><strong>Scarring Risk:</strong> If rejects, will leave two scars on prominent facial location</li>
-      <li><strong>Professional/Career Considerations:</strong> Highly visible, may impact employment - discuss thoroughly</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient tissue depth on nose bridge (< 7mm pinch test)</li>
-      <li>Client wears glasses daily and cannot/will not switch to contacts during healing</li>
-      <li>Previous bridge piercing rejection or severe migration</li>
-      <li>Client history of high rejection rates on surface piercings</li>
-      <li>Unrealistic expectations about permanence (inform about rejection risk)</li>
-      <li>Career/professional concerns that client hasn't fully considered</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2-3x daily. Spray thoroughly around both ends of barbell, let sit, pat dry gently. Do NOT move or rotate jewelry.</p>
-      <p><strong>First 12 Weeks:</strong> Absolutely no glasses (including sunglasses). No makeup near piercing. Minimize excessive facial expressions. Sleep on back only.</p>
-      <p><strong>Migration Monitoring:</strong> Check weekly for signs of migration (bars getting closer to surface, jewelry becoming more visible). Any migration requires immediate professional evaluation.</p>
-      <p><strong>Warning Signs:</strong> Signs of migration (jewelry becoming shallower), persistent bumps, or severe irritation may indicate rejection process. Professional evaluation critical to determine if removal necessary.</p>`
-  },
-
-  'eyebrow': {
-    name: 'Eyebrow Piercing',
-    optimalAngle: '40-50° following brow curve',
-    insertionDepth: '5-8mm surface piercing',
-    tissueType: 'Soft tissue (surface piercing)',
-    healingTime: '6-8 weeks',
-    jewelryGauge: '16g (1.2mm) or 14g (1.6mm)',
-    jewelryLength: '10-12mm curved barbell',
-    jewelryType: 'Curved barbell',
-    downsizeTime: '4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Vertical along outer third of eyebrow, or horizontal through brow. Placement must follow natural brow curve and avoid facial nerves/vessels.</p>
-      <p><strong>Anatomical Considerations:</strong> Eyebrow area has significant nerve branches (supraorbital nerve) and blood vessels. Always mark carefully avoiding major vessels. Tissue must have adequate depth (minimum 7mm pinch) to support piercing.</p>
-      <p><strong>Angle Guidelines:</strong> Must follow natural angle of brow (40-50 degrees typically). Angle ensures jewelry follows face contour and minimizes rejection risk.</p>`,
-    safety: `<ul>
-      <li><strong>Nerve Proximity:</strong> Supraorbital nerve runs through brow area; avoid placing piercing directly over nerve (client will feel immediate sharp nerve pain if hit)</li>
-      <li><strong>Surface Piercing Risks:</strong> High rejection/migration rate; only pierce if adequate tissue depth</li>
-      <li><strong>Snagging Risk:</strong> Very prone to snagging on hair, towels, clothing during healing</li>
-      <li><strong>Facial Movement:</strong> Eyebrow expressions cause significant jewelry movement</li>
-      <li><strong>Professional Visibility:</strong> Highly visible facial piercing; discuss career implications</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient tissue depth (< 7mm pinch test)</li>
-      <li>Placement would be directly over supraorbital nerve location</li>
-      <li>Previous eyebrow rejection or migration</li>
-      <li>Very expressive facial movements (increases rejection risk significantly)</li>
-      <li>Scar tissue or damage in desired placement from previous piercings</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Spray around both balls of barbell, let sit, pat dry gently. Avoid moving jewelry.</p>
-      <p><strong>First 6-8 Weeks:</strong> Extreme caution with hair, towels, makeup. No makeup on/near piercing. Sleep on back or opposite side. Be gentle with facial expressions.</p>
-      <p><strong>Migration Watch:</strong> Monitor weekly for signs of migration (jewelry becoming more shallow, more visible through skin). Common with eyebrow piercings.</p>
-      <p><strong>Warning Signs:</strong> Any signs of migration, persistent bumps at entry/exit points, or jewelry becoming shallower requires immediate professional evaluation. Early detection critical.</p>`
-  },
-
-  'labret': {
-    name: 'Labret Piercing',
-    optimalAngle: '90° perpendicular through lower lip',
-    insertionDepth: '10-12mm through lip tissue',
-    tissueType: 'Soft tissue + mucous membrane',
-    healingTime: '6-8 weeks',
-    jewelryGauge: '16g (1.2mm) or 14g (1.6mm)',
-    jewelryLength: '12-16mm labret stud (swelling accommodation)',
-    jewelryType: 'Flat-back labret stud',
-    downsizeTime: '4-6 weeks (critical for oral piercings)',
-    positioning: `<p><strong>Optimal Placement:</strong> Centered below lower lip, between lip and chin. Placement must consider gum line on interior - jewelry must not rest against gums or cause recession.</p>
-      <p><strong>Anatomical Considerations:</strong> Assess interior mouth anatomy carefully. Jewelry disc must rest against interior lip tissue, NOT gums. If anatomy places disc against gums, adjust placement or refuse. Check for lip webbing (frenulum) that could interfere.</p>
-      <p><strong>Angle Guidelines:</strong> Perpendicular (90 degrees) through lip ensures jewelry sits flush externally and comfortably internally without pressure points.</p>`,
-    safety: `<ul>
-      <li><strong>Oral Health Critical:</strong> Requires excellent oral hygiene; do not pierce if poor dental health, active cavities, or gum disease</li>
-      <li><strong>Gum Recession Risk:</strong> Jewelry rubbing gums causes recession; placement and downsize timing critical to prevent</li>
-      <li><strong>Tooth Damage:</strong> Jewelry can chip teeth if too long or if client plays with it; educate thoroughly about keeping jewelry away from teeth</li>
-      <li><strong>Initial Swelling:</strong> Labret swells significantly first week; long initial jewelry essential</li>
-      <li><strong>Speech Impediment:</strong> Temporary speech changes first few days until adjustment occurs</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Poor oral health, active cavities, or gum disease (require dental clearance)</li>
-      <li>Anatomy places jewelry disc against gums unavoidably (will cause recession)</li>
-      <li>Client smokes heavily (dramatically impairs oral piercing healing)</li>
-      <li>Previous labret rejection or severe complications</li>
-      <li>Lip webbing interferes with safe placement</li>
-    </ul>`,
-    aftercare: `<p><strong>External Cleaning:</strong> Sterile saline spray 2x daily on outside of piercing. Pat dry gently.</p>
-      <p><strong>Internal Cleaning:</strong> Alcohol-free mouthwash after eating, drinking (except water), and before bed. Rinse 30-60 seconds, do NOT use alcohol-based mouthwash (drying and irritating).</p>
-      <p><strong>First 2 Weeks:</strong> Avoid spicy food, hot liquids, alcohol, smoking (especially smoking). Expect swelling days 2-5. Cold water and ice chips help swelling.</p>
-      <p><strong>Downsize Critical:</strong> MUST downsize jewelry at 4-6 weeks once swelling resolves. Long jewelry left in damages teeth and gums.</p>`
-  },
-
-  'monroe': {
-    name: 'Monroe Piercing',
-    optimalAngle: '90° through upper lip',
-    insertionDepth: '8-10mm through lip tissue',
-    tissueType: 'Soft tissue + mucous membrane',
-    healingTime: '6-8 weeks',
-    jewelryGauge: '16g (1.2mm)',
-    jewelryLength: '10-12mm labret stud',
-    jewelryType: 'Flat-back labret stud',
-    downsizeTime: '4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Upper lip to left (Monroe) or right (Madonna) side, typically at or above vermilion border. Emulates beauty mark placement.</p>
-      <p><strong>Anatomical Considerations:</strong> Must assess interior mouth anatomy. Jewelry disc must rest against upper lip interior, not against gums or frenulum. Upper lip tissue thinner than lower; measure carefully.</p>
-      <p><strong>Angle Guidelines:</strong> Perpendicular (90 degrees) through upper lip. Slightly downward angle acceptable if needed to prevent gum contact internally.</p>`,
-    safety: `<ul>
-      <li><strong>Gum Contact Risk:</strong> Upper lip placement increases gum contact risk; jewelry must not rest against gums</li>
-      <li><strong>Frenulum Proximity:</strong> Upper lip has prominent frenulum (webbing); placement must avoid interference</li>
-      <li><strong>Tooth Damage Risk:</strong> Internal disc can contact teeth; sizing and placement critical</li>
-      <li><strong>Less Swelling Than Lower Lip:</strong> Upper lip swells less than lower but still requires longer initial jewelry</li>
-      <li><strong>Oral Hygiene Critical:</strong> Poor oral health contraindicates all oral piercings</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Frenulum attachment too close to desired placement (will interfere with piercing)</li>
-      <li>Anatomy would place jewelry disc against gums unavoidably</li>
-      <li>Poor oral health or active dental issues</li>
-      <li>Client smokes heavily (impairs healing significantly)</li>
-      <li>Upper lip too thin (< 6mm tissue depth)</li>
-    </ul>`,
-    aftercare: `<p><strong>External Cleaning:</strong> Sterile saline spray 2x daily externally, pat dry.</p>
-      <p><strong>Internal Cleaning:</strong> Alcohol-free mouthwash after eating/drinking (except water) and before bed. Rinse 30-60 seconds.</p>
-      <p><strong>First 2 Weeks:</strong> Avoid spicy foods, acidic foods (citrus, tomato), hot liquids, alcohol. Expect moderate swelling days 2-4.</p>
-      <p><strong>Downsize Required:</strong> Must downsize at 4-6 weeks to prevent tooth/gum damage from excess jewelry length.</p>`
-  },
-
-  'medusa': {
-    name: 'Medusa (Philtrum) Piercing',
-    optimalAngle: '90° through philtrum',
-    insertionDepth: '8-10mm through upper lip center',
-    tissueType: 'Soft tissue + mucous membrane',
-    healingTime: '8-12 weeks',
-    jewelryGauge: '16g (1.2mm) or 14g (1.6mm)',
-    jewelryLength: '12-14mm labret stud',
-    jewelryType: 'Flat-back labret stud',
-    downsizeTime: '4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Center of philtrum (groove above upper lip), below septum. Must be centered precisely for aesthetic balance.</p>
-      <p><strong>Anatomical Considerations:</strong> Philtrum anatomy varies significantly. Some have very pronounced groove, others quite flat. Internal frenulum (upper lip webbing) may be very prominent - piercing must not interfere. Assess gum line contact carefully.</p>
-      <p><strong>Angle Guidelines:</strong> Perpendicular (90 degrees) straight through philtrum center. Precise centering critical - even slight off-center placement is visually obvious.</p>`,
-    safety: `<ul>
-      <li><strong>Centering Critical:</strong> Must be perfectly centered; off-center medusa is aesthetically poor and difficult to correct</li>
-      <li><strong>Frenulum Interference:</strong> Upper frenulum frequently prominent; piercing must not pierce through or constantly rub against frenulum</li>
-      <li><strong>Gum Damage High Risk:</strong> Internal disc sits very close to gums; causes recession in many clients even with proper placement</li>
-      <li><strong>Swelling Significant:</strong> Medusa swells substantially, especially in philtrum groove area</li>
-      <li><strong>High Rejection Rate:</strong> If anatomy unsuitable, rejection rate relatively high compared to other lip piercings</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Frenulum attachment so prominent it interferes with placement</li>
-      <li>Anatomy would unavoidably place jewelry disc against gums</li>
-      <li>Philtrum too shallow or flat (jewelry won't sit properly)</li>
-      <li>Poor oral health or active dental/gum issues</li>
-      <li>Client expectations for placement cannot be met safely with their anatomy (off-center placement not acceptable)</li>
-    </ul>`,
-    aftercare: `<p><strong>External Cleaning:</strong> Sterile saline spray 2x daily externally, pat dry gently.</p>
-      <p><strong>Internal Cleaning:</strong> Alcohol-free mouthwash after eating/drinking (except water) and before bed. Rinse 30-60 seconds gently.</p>
-      <p><strong>First 2-3 Weeks:</strong> Significant swelling expected days 2-5. Cold water, ice chips help. Avoid spicy, acidic, hot foods. No alcohol or smoking.</p>
-      <p><strong>Downsize Essential:</strong> MUST downsize at 4-6 weeks. Long jewelry left in causes gum recession and tooth damage. Monitor gum line for recession signs throughout healing.</p>`
-  },
-
-  'tongue': {
-    name: 'Tongue Piercing',
-    optimalAngle: '90° vertical through tongue center',
-    insertionDepth: '15-20mm through tongue muscle',
-    tissueType: 'Muscle tissue + mucous membrane',
-    healingTime: '4-6 weeks',
-    jewelryGauge: '14g (1.6mm)',
-    jewelryLength: '18-22mm straight barbell (swelling accommodation)',
-    jewelryType: 'Straight barbell',
-    downsizeTime: '2-4 weeks (critical)',
-    positioning: `<p><strong>Optimal Placement:</strong> Center of tongue, vertically, typically 15-20mm from tip. Must avoid lingual artery (runs underneath) and major veins (visible on tongue underside).</p>
-      <p><strong>Anatomical Considerations:</strong> CRITICAL: Assess tongue underside thoroughly for vascular anatomy. Lingual artery runs lengthwise under tongue - NEVER pierce through artery location. Large visible veins must be avoided. Some tongues have short frenulum (tongue webbing) limiting safe placement distance from tip.</p>
-      <p><strong>Angle Guidelines:</strong> Perfectly vertical (90 degrees) through center of tongue ensures proper healing and jewelry placement. Off-center causes tongue discomfort and speech issues.</p>`,
-    safety: `<ul>
-      <li><strong>Vascular Risk:</strong> Tongue highly vascular; hitting lingual artery causes severe bleeding/emergency; ALWAYS assess underside carefully before piercing</li>
-      <li><strong>Nerve Risk:</strong> Tongue has significant nerve branches; piercing too far back or off-center risks nerve damage</li>
-      <li><strong>Massive Initial Swelling:</strong> Tongue swells dramatically first 3-5 days; long initial barbell critical to prevent choking/breathing issues</li>
-      <li><strong>Tooth Damage:</strong> Highest tooth chipping risk of all oral piercings; client education critical about jewelry contact with teeth</li>
-      <li><strong>Speech Impediment:</strong> Temporary significant speech changes first week until adjustment</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Lingual artery or major blood vessels in desired placement location (non-negotiable)</li>
-      <li>Short frenulum preventing safe placement distance from tongue tip</li>
-      <li>Tongue tie or other anatomical abnormalities limiting safe placement</li>
-      <li>Poor oral health, active infections, or gum disease</li>
-      <li>Client cannot commit to liquid/soft diet first week (necessary for healing)</li>
-      <li>History of excessive tongue piercing complications or rejection</li>
-    </ul>`,
-    aftercare: `<p><strong>Oral Cleaning:</strong> Alcohol-free mouthwash after EVERY meal, snack, drink (except water), and before bed. Rinse 30 seconds minimum.</p>
-      <p><strong>First Week:</strong> Liquid/soft foods only (soup, smoothies, mashed potatoes, ice cream). Cold foods help swelling. NO spicy, acidic, crunchy, or hot foods. Swelling peaks days 3-5.</p>
-      <p><strong>Downsize CRITICAL:</strong> MUST downsize barbell at 2-4 weeks once swelling resolved. Long barbell causes tooth damage and gum recession. Non-negotiable downsize appointment.</p>
-      <p><strong>Long Term:</strong> Check barbell tightness daily (balls unscrew from tongue movement). Plastic balls recommended after healing to reduce tooth chipping risk.</p>`
-  },
-
-  // ===== BODY PIERCINGS =====
-  'navel': {
-    name: 'Navel (Belly Button) Piercing',
-    optimalAngle: '45-50° following navel rim curve',
-    insertionDepth: '15-20mm through navel lip',
-    tissueType: 'Soft tissue',
-    healingTime: '6-12 months',
-    jewelryGauge: '14g (1.6mm)',
-    jewelryLength: '10-12mm curved barbell',
-    jewelryType: 'Curved barbell',
-    downsizeTime: '8-12 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Through upper rim of navel (traditional) or lower rim (reverse navel). Piercing must go through substantial rim/lip of tissue, not flat stomach surface.</p>
-      <p><strong>Anatomical Considerations:</strong> CRITICAL: Not all navels have suitable anatomy for piercing. Navel must have pronounced lip/rim of tissue (minimum 8mm) that folds over when sitting. Flat navels or "outie" navels typically not suitable. Assess anatomy standing AND sitting - sitting position reveals true tissue availability.</p>
-      <p><strong>Angle Guidelines:</strong> Must follow natural curve of navel rim, typically 45-50 degrees. Angle ensures jewelry sits properly and minimizes rejection pressure.</p>`,
-    safety: `<ul>
-      <li><strong>Anatomy Critical:</strong> High rejection rate if anatomy unsuitable; REFUSE if insufficient tissue or flat navel</li>
-      <li><strong>Surface Piercing Characteristics:</strong> Navel has surface piercing tendencies; movement from clothing, bending increases rejection risk</li>
-      <li><strong>Pregnancy:</strong> Ask about pregnancy plans; navel piercings often need removal during pregnancy</li>
-      <li><strong>Clothing Friction:</strong> High-waisted pants, tight clothing causes constant irritation during healing</li>
-      <li><strong>Longest Healing:</strong> Navel takes 9-12 months full healing; clients must commit to long healing period</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Flat navel with insufficient lip/rim of tissue (will reject)</li>
-      <li>Outie navel (not suitable anatomy)</li>
-      <li>Navel lip tissue too thin (< 8mm) measured sitting and standing</li>
-      <li>Previous navel rejection or severe migration</li>
-      <li>Client pregnant or planning pregnancy in next 12 months</li>
-      <li>Client wears high-waisted pants/tight clothing daily and cannot modify during healing</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Spray thoroughly, let sit, rinse in shower, pat dry completely. Keep navel dry between cleanings.</p>
-      <p><strong>First 6 Months:</strong> Wear loose, low-rise clothing. Avoid tight pants, high-waisted styles. No swimming (pools, lakes, ocean). Sleep on back or side (not stomach). No submerging in bathtubs.</p>
-      <p><strong>Exercise Caution:</strong> Avoid sit-ups, crunches, yoga poses that bend/pressure navel. Light exercise okay; excessive sweating requires immediate cleaning.</p>
-      <p><strong>Long Healing:</strong> Expect 9-12 months minimum for full healing. Jewelry changes only after completely healed and evaluated by professional. Signs of migration require immediate attention.</p>`
-  },
-
-  'nipple': {
-    name: 'Nipple Piercing',
-    optimalAngle: '90° horizontal through nipple base',
-    insertionDepth: '12-18mm depending on nipple size',
-    tissueType: 'Soft tissue + erectile tissue',
-    healingTime: '6-12 months',
-    jewelryGauge: '14g (1.6mm) or 12g (2.0mm)',
-    jewelryLength: '14-18mm straight barbell (measure carefully)',
-    jewelryType: 'Straight barbell',
-    downsizeTime: '8-12 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Horizontal through base of nipple, behind areola. Placement must be through nipple tissue itself, not areola skin.</p>
-      <p><strong>Anatomical Considerations:</strong> Nipple size, projection, and anatomy vary dramatically. Use calipers to measure nipple width precisely. Must have minimum 8mm nipple projection for safe piercing. Inverted nipples without adequate projection are not suitable. Assess nipple symmetry if piercing pair.</p>
-      <p><strong>Angle Guidelines:</strong> Perfectly horizontal (90 degrees) through base of nipple ensures symmetrical appearance and even healing. Angle deviation causes uneven placement and potential migration.</p>`,
-    safety: `<ul>
-      <li><strong>Breastfeeding:</strong> CAN impact future breastfeeding; discuss thoroughly with clients of childbearing age</li>
-      <li><strong>Sensation Changes:</strong> May increase or decrease nipple sensation; changes usually temporary but can be permanent</li>
-      <li><strong>Inverted Nipples:</strong> Not suitable unless nipple has adequate projection when stimulated (minimum 8mm)</li>
-      <li><strong>Infection Risk:</strong> Breast tissue infection (mastitis) possible if complications occur; requires immediate medical attention</li>
-      <li><strong>Very Painful:</strong> One of most painful piercings; prepare clients for pain level</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient nipple projection (< 8mm), including inverted nipples without adequate erect projection</li>
-      <li>Currently breastfeeding or pregnant (wait until after breastfeeding complete)</li>
-      <li>History of breast cancer, breast surgery, or breast tissue abnormalities without physician clearance</li>
-      <li>Active breast infection, cysts, or other breast health issues</li>
-      <li>Client unrealistic about breastfeeding impact (discuss thoroughly before proceeding)</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Spray thoroughly, let sit, rinse in shower, pat dry completely with clean gauze. Crusties very common on nipple piercings.</p>
-      <p><strong>First 3 Months:</strong> Wear clean, soft, supportive bra (sports bra) during day. Sleep in soft bra initially. Avoid tight bras, lace, or rough fabrics that snag. No swimming. No oral contact.</p>
-      <p><strong>Months 4-12:</strong> Continue cleaning if any crusties present. Avoid rough contact, excessive friction. No jewelry changes until completely healed (12+ months minimum).</p>
-      <p><strong>Warning Signs:</strong> Excessive swelling, severe pain, red streaks spreading from piercing, fever, or signs of infection require immediate medical evaluation (mastitis risk). Some pain and swelling first week is normal.</p>`
-  },
-
-  'surface': {
-    name: 'Surface Piercing',
-    optimalAngle: '90° with surface bar',
-    insertionDepth: '5-8mm surface depth',
-    tissueType: 'Soft tissue (surface placement)',
-    healingTime: '3-6 months',
-    jewelryGauge: '14g (1.6mm) or 12g (2.0mm)',
-    jewelryLength: 'Custom surface bar 15-25mm',
-    jewelryType: 'Surface barbell (90° bends)',
-    downsizeTime: 'N/A - custom fitted from start',
-    positioning: `<p><strong>Optimal Placement:</strong> Various locations (collarbone, chest, nape, wrist, etc.). Location must have sufficient tissue depth and minimal movement/friction.</p>
-      <p><strong>Anatomical Considerations:</strong> CRITICAL: Tissue must be "pinchable" with minimum 8-10mm depth. Surface piercings have high rejection rate; only pierce if anatomy truly suitable. Assess movement in area, clothing friction, and daily activities that might impact piercing.</p>
-      <p><strong>Angle Guidelines:</strong> Surface bars with 90-degree bends required. Bar must sit under skin with minimal pressure. Improper jewelry or angle causes rapid rejection.</p>`,
-    safety: `<ul>
-      <li><strong>High Rejection Rate:</strong> Surface piercings reject more frequently than traditional piercings; clients must understand this risk</li>
-      <li><strong>Scarring Risk:</strong> Rejection leaves two scars; placement must be acceptable for scarring</li>
-      <li><strong>Movement Increases Risk:</strong> Areas with significant body movement reject faster</li>
-      <li><strong>Friction Risk:</strong> Constant clothing friction accelerates rejection</li>
-      <li><strong>Not Permanent:</strong> Even with perfect placement/care, surface piercings often reject within 1-5 years; set realistic expectations</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient tissue depth (< 8mm pinch test)</li>
-      <li>Location has excessive movement, friction, or pressure during normal activities</li>
-      <li>Previous surface piercing rejection in same or similar area</li>
-      <li>Client unrealistic about permanence (must understand rejection likelihood)</li>
-      <li>Scarring in desired location unacceptable to client (rejection will leave scars)</li>
-      <li>Location has existing scar tissue or skin abnormalities</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2-3x daily. Spray thoroughly around both ends of surface bar, let sit, pat dry gently. Do NOT move or rotate jewelry.</p>
-      <p><strong>First 3 Months:</strong> Avoid tight clothing over piercing. Minimize friction and pressure. Be very gentle - surface piercings sensitive to trauma.</p>
-      <p><strong>Migration Monitoring:</strong> Check WEEKLY for signs of migration (bar becoming more visible/shallow, skin thinning over bar, ends moving closer together). Early detection critical.</p>
-      <p><strong>Warning Signs:</strong> ANY signs of migration, skin thinning over jewelry, or increased visibility of bar requires immediate professional evaluation. Migration indicates rejection process starting; early removal prevents worse scarring.</p>`
-  },
-
-  'dermal': {
-    name: 'Dermal Anchor (Microdermal)',
-    optimalAngle: 'N/A - single point piercing',
-    insertionDepth: '5-7mm beneath skin surface',
-    tissueType: 'Dermal layer',
-    healingTime: '1-3 months',
-    jewelryGauge: 'N/A - dermal anchor base',
-    jewelryLength: 'N/A - decorative top',
-    jewelryType: 'Dermal anchor with interchangeable tops',
-    downsizeTime: 'N/A - top can be changed after healed',
-    positioning: `<p><strong>Optimal Placement:</strong> Various locations (face, chest, back, etc.). Single point piercing with anchor under skin, decorative top above. Location must have minimal movement and sufficient tissue depth.</p>
-      <p><strong>Anatomical Considerations:</strong> Requires sufficient tissue depth (minimum 6mm) and stable tissue (not over joints, high-movement areas). Bone proximity varies by location - anchors over prominent bones less stable. Assess tissue type and depth carefully.</p>
-      <p><strong>Technique:</strong> Needle method or dermal punch. Anchor base sits in dermal pocket beneath skin. Tissue must grow around anchor base for stability.</p>`,
-    safety: `<ul>
-      <li><strong>Removal Requires Minor Procedure:</strong> Cannot simply unscrew like regular piercing; anchor must be removed by professional (sometimes requires minor excision)</li>
-      <li><strong>Rejection Risk:</strong> Can reject like surface piercings; leaves scar if rejected</li>
-      <li><strong>Snagging Risk:</strong> Dermal tops protrude and snag on clothing, hair, towels</li>
-      <li><strong>Migration:</strong> Can migrate toward surface over time, especially in high-movement areas</li>
-      <li><strong>MRI Incompatible:</strong> Some dermal materials not MRI-safe; must use titanium anchors</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient tissue depth at desired location (< 6mm)</li>
-      <li>Location over joints, high-movement areas, or prominent bones</li>
-      <li><li>Previous dermal rejection at same or similar site</li>
-      <li>Client does not understand removal process/permanence implications</li>
-      <li>Occupation creates high snagging risk (construction, childcare, healthcare with daily equipment use)</li>
-      <li>Location on face without thorough discussion of professional/social implications</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning Protocol:</strong> Sterile saline spray 2x daily. Spray around dermal top, let sit, pat dry gently. Do NOT rotate or move jewelry top.</p>
-      <p><strong>First Month:</strong> Avoid snagging, pulling, or pressure on dermal. Keep bandage on first few days. Avoid clothing that catches on dermal top.</p>
-      <p><strong>Top Changes:</strong> Can change decorative top after fully healed (3+ months). Tops screw in/out; be very gentle to avoid pulling anchor.</p>
-      <p><strong>Warning Signs:</strong> Signs of migration (dermal becoming more raised, visible), redness spreading, rejection symptoms, or loosening requires professional evaluation. Rejection/migration requires anchor removal to prevent complications.</p>`
-  },
-
-  // ===== GENITAL PIERCINGS (Brief professional reference) =====
-  'prince-albert': {
-    name: 'Prince Albert (PA)',
-    optimalAngle: '45° through urethra to underside',
-    insertionDepth: '8-12mm (varies significantly)',
-    tissueType: 'Soft tissue + urethral tissue',
-    healingTime: '4-6 weeks',
-    jewelryGauge: '10g (2.4mm) or 12g (2.0mm) (thick gauge for stability)',
-    jewelryLength: 'N/A - circular jewelry',
-    jewelryType: 'Captive bead ring or circular barbell',
-    downsizeTime: 'Diameter adjustment at 4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Entry through urethra, exit on underside of glans. Precise placement critical for function and comfort.</p>
-      <p><strong>Anatomical Considerations:</strong> ADVANCED PIERCING requiring significant experience. Anatomy varies greatly between clients. Must assess urethral opening size/position and underside anatomy. Some anatomy unsuitable for PA placement.</p>`,
-    safety: `<ul>
-      <li><strong>ADVANCED PROFESSIONAL ONLY:</strong> Requires extensive genital piercing experience and training</li>
-      <li><strong>Urination Changes:</strong> Initial stream splits during healing; inform clients thoroughly</li>
-      <li><strong>Sexual Activity:</strong> Must abstain minimum 4-6 weeks; partners must be informed about jewelry</li>
-      <li><strong>Thick Gauge Required:</strong> Thinner gauges migrate/tear; 10g-12g minimum for safety</li>
-      <li><strong>Informed Consent Critical:</strong> Extensive consultation required about risks, healing, lifestyle changes</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Inexperienced piercer (only advanced professionals should perform genital piercings)</li>
-      <li>Anatomy unsuitable (urethral opening too small, underside anatomy insufficient)</li>
-      <li>Active STI or genital infection</li>
-      <li>Client cannot abstain from sexual activity during healing</li>
-      <li>Client does not fully understand risks and lifestyle implications</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning:</strong> Sea salt soaks 2x daily. Rinse thoroughly after urination. Thorough soap-and-water cleaning daily during healing.</p>
-      <p><strong>First 4-6 Weeks:</strong> Absolutely no sexual activity. Expect split urinary stream. Sit to urinate initially to manage stream. Loose-fitting underwear required.</p>
-      <p><strong>Professional Guidance:</strong> Genital piercings require professional follow-up and monitoring. Any concerns require immediate professional evaluation.</p>`
-  },
-
-  'vch': {
-    name: 'Vertical Clitoral Hood (VCH)',
-    optimalAngle: '90° vertical through clitoral hood',
-    insertionDepth: '6-10mm through hood tissue',
-    tissueType: 'Soft tissue (clitoral hood)',
-    healingTime: '4-8 weeks',
-    jewelryGauge: '14g (1.6mm) or 12g (2.0mm)',
-    jewelryLength: 'N/A - curved barbell',
-    jewelryType: 'Curved barbell',
-    downsizeTime: '4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Vertically through clitoral hood above clitoris. Must have sufficient hood tissue that extends beyond clitoris when standing.</p>
-      <p><strong>Anatomical Considerations:</strong> CRITICAL: Not all anatomy suitable for VCH. Hood must have adequate tissue and coverage. Approximately 30-40% of people lack suitable anatomy for VCH. Professional assessment required.</p>`,
-    safety: `<ul>
-      <li><strong>ADVANCED PROFESSIONAL ONLY:</strong> Requires specialized genital piercing training and experience</li>
-      <li><strong>Anatomy Assessment Critical:</strong> Many clients lack suitable hood anatomy; thorough evaluation required</li>
-      <li><strong>Sexual Activity:</strong> Abstain minimum 4-6 weeks</li>
-      <li><strong>Sensitivity Changes:</strong> May increase or decrease sensation; discuss thoroughly</li>
-      <li><strong>Fast Healing:</strong> VCH often heals faster than other genital piercings when anatomy suitable</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient clitoral hood tissue (approximately 30-40% of clients lack suitable anatomy)</li>
-      <li>Hood does not extend adequately over clitoris when standing</li>
-      <li>Active infection, STI, or genital health issues</li>
-      <li>Pregnancy or plans to become pregnant during healing period</li>
-      <li>Client cannot abstain from sexual activity during healing</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning:</strong> Saline spray or sea salt soaks 2x daily. Rinse thoroughly after urination. Soap-and-water cleaning daily during shower.</p>
-      <p><strong>First 4-6 Weeks:</strong> No sexual activity. Wear breathable cotton underwear. Avoid tight clothing. Sleep without underwear when possible for airflow.</p>
-      <p><strong>Professional Follow-Up:</strong> Genital piercings require professional monitoring. Any concerns require immediate professional evaluation.</p>`
-  },
-
-  'christina': {
-    name: 'Christina Piercing',
-    optimalAngle: '90° surface piercing vertical',
-    insertionDepth: '8-12mm surface piercing',
-    tissueType: 'Soft tissue (pubic mound)',
-    healingTime: '6-9 months',
-    jewelryGauge: '14g (1.6mm) or 12g (2.0mm)',
-    jewelryLength: 'Custom surface bar 15-25mm',
-    jewelryType: 'Surface barbell',
-    downsizeTime: 'N/A - custom fitted',
-    positioning: `<p><strong>Optimal Placement:</strong> Vertical surface piercing on pubic mound, from top of clitoral hood area up toward pubic bone. Aesthetic piercing without contact with clitoris.</p>
-      <p><strong>Anatomical Considerations:</strong> Surface piercing with high rejection rate. Requires substantial tissue depth (minimum 10mm pinch). Not all anatomy suitable - mons pubis must have adequate tissue and appropriate angle.</p>`,
-    safety: `<ul>
-      <li><strong>ADVANCED PROFESSIONAL ONLY:</strong> Complex surface piercing in sensitive area</li>
-      <li><strong>High Rejection Rate:</strong> Surface piercing with significant movement/friction; rejection common</li>
-      <li><strong>Long Healing:</strong> Takes 6-9+ months, longer than most genital piercings</li>
-      <li><strong>Scarring Risk:</strong> Rejection leaves visible scars in intimate area</li>
-      <li><strong>Friction Issues:</strong> Clothing friction accelerates rejection risk</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient tissue depth (< 10mm pinch test)</li>
-      <li>Anatomy angle unsuitable for surface bar placement</li>
-      <li>Previous Christina rejection or genital surface piercing complications</li>
-      <li>Client unrealistic about rejection risk and scarring</li>
-      <li>Lifestyle/clothing creates excessive friction during healing</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning:</strong> Saline spray 2-3x daily. Keep area clean and dry. Wear loose, breathable cotton underwear.</p>
-      <p><strong>First 6 Months:</strong> No tight clothing, no sexual activity first 8 weeks minimum. Monitor weekly for migration signs.</p>
-      <p><strong>Migration Watch:</strong> Check frequently for migration/rejection signs. Any migration requires immediate professional evaluation and likely removal.</p>`
-  },
-
-  'frenum': {
-    name: 'Frenum Piercing',
-    optimalAngle: '90° horizontal through shaft skin',
-    insertionDepth: '6-8mm through shaft skin',
-    tissueType: 'Soft tissue (penile shaft)',
-    healingTime: '4-8 weeks',
-    jewelryGauge: '12g (2.0mm) or 10g (2.4mm)',
-    jewelryLength: '10-14mm curved barbell',
-    jewelryType: 'Curved barbell or circular barbell',
-    downsizeTime: '4-6 weeks',
-    positioning: `<p><strong>Optimal Placement:</strong> Horizontal through skin on underside of penile shaft, typically behind corona. Can be single or ladder (multiple piercings).</p>
-      <p><strong>Anatomical Considerations:</strong> Requires adequate loose skin on shaft. Circumcision status affects available skin. Must avoid visible blood vessels and ensure adequate tissue depth.</p>`,
-    safety: `<ul>
-      <li><strong>ADVANCED PROFESSIONAL ONLY:</strong> Genital piercing requiring specialized training</li>
-      <li><strong>Vessel Avoidance:</strong> Must carefully mark to avoid visible blood vessels on shaft</li>
-      <li><strong>Migration Risk:</strong> Can migrate if tissue insufficient or gauge too thin</li>
-      <li><strong>Sexual Activity:</strong> Abstain minimum 6-8 weeks</li>
-      <li><strong>Multiple Piercings:</strong> Frenum ladder requires careful spacing and angle consistency</li>
-    </ul>`,
-    refuse: `<ul>
-      <li>Insufficient shaft skin (too tight or lacking mobility)</li>
-      <li>Prominent blood vessels that cannot be avoided in desired placement</li>
-      <li>Active STI or genital infection</li>
-      <li>Scar tissue from previous piercings preventing safe placement</li>
-      <li>Client cannot abstain from sexual activity during healing</li>
-    </ul>`,
-    aftercare: `<p><strong>Cleaning:</strong> Saline spray or sea salt soaks 2x daily. Thorough cleaning with soap and water daily. Pat dry completely.</p>
-      <p><strong>First 6-8 Weeks:</strong> No sexual activity. Wear loose-fitting underwear and clothing. Monitor for signs of migration or irritation.</p>
-      <p><strong>Professional Follow-Up:</strong> All genital piercings require professional monitoring during healing. Any concerns require immediate evaluation.</p>`
+  // Active studio preferences storage delegation
+  function getStudioPreferences() {
+    return storage.getStudioPreferences ? storage.getStudioPreferences() : {};
   }
-};
 
-// =====================================================
-// INTERACTIVE FUNCTIONALITY
-// =====================================================
+  function saveStudioPreference(piercingKey, prefData) {
+    if (storage.saveStudioPreference) {
+      storage.saveStudioPreference(piercingKey, prefData);
+    }
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const piercingButtons = document.querySelectorAll('.piercing-btn');
-  const piercingDetails = document.getElementById('piercingDetails');
-  const piercingName = document.getElementById('piercingName');
+  function resetStudioPreference(piercingKey) {
+    if (storage.resetStudioPreference) {
+      storage.resetStudioPreference(piercingKey);
+    }
+  }
 
-  // Specification elements
-  const optimalAngle = document.getElementById('optimalAngle');
-  const insertionDepth = document.getElementById('insertionDepth');
-  const tissueType = document.getElementById('tissueType');
-  const healingTime = document.getElementById('healingTime');
-  const jewelryGauge = document.getElementById('jewelryGauge');
-  const jewelryLength = document.getElementById('jewelryLength');
-  const jewelryType = document.getElementById('jewelryType');
-  const downsizeTime = document.getElementById('downsizeTime');
 
-  // Content sections
-  const positioningContent = document.getElementById('positioningContent');
-  const safetyContent = document.getElementById('safetyContent');
-  const refuseContent = document.getElementById('refuseContent');
-  const aftercareContent = document.getElementById('aftercareContent');
+  // Modular UI Logic Delegations
+  var visualizer = (typeof window !== 'undefined' && window.PiercingVisualizer) || {};
 
-  // Add click event listeners to all piercing buttons
-  piercingButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const piercingType = this.getAttribute('data-piercing');
-      const data = piercingData[piercingType];
+  var getActiveJewelryOption = visualizer.getActiveJewelryOption || (window.getActiveJewelryOption || function() { return null; });
+  var renderJewelry3D = visualizer.renderJewelry3D || (window.renderJewelry3D || function() { return ''; });
+  var calculateChannelMetrics = visualizer.calculateChannelMetrics || (window.calculateChannelMetrics || function() { return {}; });
+  var renderV2InteractiveSvg = visualizer.renderV2InteractiveSvg || (window.renderV2InteractiveSvg || function() { return ''; });
+  var renderErrorModeSvg = visualizer.renderErrorModeSvg || (window.renderErrorModeSvg || function() { return ''; });
+  var renderSymmetrySvg = visualizer.renderSymmetrySvg || (window.renderSymmetrySvg || function() { return ''; });
+  var renderSymmetryLandmarkSvg = visualizer.renderSymmetryLandmarkSvg || (window.renderSymmetryLandmarkSvg || function() { return ''; });
+  var getSymmetryStepsData = visualizer.getSymmetryStepsData || (window.getSymmetryStepsData || function() { return []; });
+  // Translate with an English fallback; a returned key counts as missing.
+  function tr(key, params, fallback) {
+    var v = window.translate ? window.translate(key, params, fallback) : fallback;
+    return (v === key || v === undefined) ? interpolateFallback(fallback, params) : v;
+  }
+  function interpolateFallback(s, params) {
+    return String(s).replace(/\{([a-zA-Z0-9_]+)\}/g, function (m, k) { return params && Object.prototype.hasOwnProperty.call(params, k) ? params[k] : m; });
+  }
 
-      if (data) {
-        // Remove active class from all buttons
-        piercingButtons.forEach(btn => btn.classList.remove('active'));
+  function initApp() {
+    // Persistent Workspace State Variables
+    var activePiercingKey = 'earlobe';
+    var currentVisualizerAngle = 90;
+    var currentMeasuredThickness = 5.0;
+    var activeJewelryOptionId = null;
+    var currentUnit = 'metric'; // 'metric' | 'imperial'
+    var isCompareMode = false;
+    var comparePiercingKeyA = 'earlobe';
+    var comparePiercingKeyB = 'helix';
+    var recentPiercings = []; // Array of up to 5 recently interacted piercing keys
 
-        // Add active class to clicked button
-        this.classList.add('active');
+    // Unit Conversion Utilities Delegated to Calculator Module
+    function getFractionalInch(mm) {
+      if (calculator.getFractionalInch) {
+        return calculator.getFractionalInch(mm);
+      }
+      var val = parseFloat(mm);
+      return isNaN(val) ? '' : (val / 25.4).toFixed(3) + '"';
+    }
 
-        // Update display
-        piercingDetails.style.display = 'block';
-        piercingName.textContent = data.name;
+    function formatMm(mm, showDual) {
+      if (calculator.formatMm) {
+        return calculator.formatMm(mm, showDual, currentUnit);
+      }
+      var val = parseFloat(mm);
+      return isNaN(val) ? String(mm) : val.toFixed(1) + ' mm';
+    }
 
-        // Update specifications
-        optimalAngle.textContent = data.optimalAngle;
-        insertionDepth.textContent = data.insertionDepth;
-        tissueType.textContent = data.tissueType;
-        healingTime.textContent = data.healingTime;
-        jewelryGauge.textContent = data.jewelryGauge;
-        jewelryLength.textContent = data.jewelryLength;
-        jewelryType.textContent = data.jewelryType;
-        downsizeTime.textContent = data.downsizeTime;
+    function formatRangeUnit(min, max, typical) {
+      if (calculator.formatRangeUnit) {
+        return calculator.formatRangeUnit(min, max, typical, currentUnit);
+      }
+      return min + ' - ' + max + ' mm';
+    }
 
-        // Update content sections
-        positioningContent.innerHTML = data.positioning;
-        safetyContent.innerHTML = data.safety;
-        refuseContent.innerHTML = data.refuse;
-        aftercareContent.innerHTML = data.aftercare;
+    // Local Storage State Persistence Helpers Delegated to Storage Manager Module
+    function saveWorkspaceState() {
+      var activeSymTab = symTabSimulator && symTabSimulator.classList.contains('active') ? 'simulator' : 'landmarks';
+      if (storage.saveWorkspaceState) {
+        storage.saveWorkspaceState({
+          activeKey: activePiercingKey,
+          unit: currentUnit,
+          compareMode: isCompareMode,
+          compareA: comparePiercingKeyA,
+          compareB: comparePiercingKeyB,
+          recents: recentPiercings,
+          symTab: activeSymTab,
+          symPair: symmetryPairSelect ? symmetryPairSelect.value : ''
+        });
+      }
+    }
 
-        // Scroll to details section
+    function loadSavedWorkspaceState() {
+      if (storage.loadWorkspaceState) {
+        var loaded = storage.loadWorkspaceState(piercingData);
+        if (loaded.activeKey && piercingData[loaded.activeKey]) {
+          activePiercingKey = loaded.activeKey;
+        }
+        if (loaded.unit) {
+          currentUnit = loaded.unit;
+        }
+        if (loaded.compareMode !== undefined) {
+          isCompareMode = loaded.compareMode;
+        }
+        if (loaded.compareA && piercingData[loaded.compareA]) {
+          comparePiercingKeyA = loaded.compareA;
+        }
+        if (loaded.compareB && piercingData[loaded.compareB]) {
+          comparePiercingKeyB = loaded.compareB;
+        }
+        if (Array.isArray(loaded.recents)) {
+          recentPiercings = loaded.recents;
+        }
+      }
+    }
+
+    // Navigation Buttons
+    var piercingButtons = document.querySelectorAll('.piercing-btn');
+    var piercingDetails = document.getElementById('piercingDetails');
+    var piercingName = document.getElementById('piercingName');
+
+    // Unit Toggle Buttons
+    var unitToggleBtn = document.getElementById('unitToggleBtn');
+    var unitToggleText = document.getElementById('unitToggleText');
+    var unitToggleQuickBtn = document.getElementById('unitToggleQuickBtn');
+    var unitToggleQuickText = document.getElementById('unitToggleQuickText');
+
+    // Compare Mode Elements
+    var compareModeToggleBtn = document.getElementById('compareModeToggleBtn');
+    var compareModeBtnText = document.getElementById('compareModeBtnText');
+    var compareWorkspace = document.getElementById('compareWorkspace');
+    var comparePrintBtn = document.getElementById('comparePrintBtn');
+    var exitCompareBtn = document.getElementById('exitCompareBtn');
+    var comparePresetPills = document.querySelectorAll('.compare-preset-pill');
+
+    var compareSelectA = document.getElementById('compareSelectA');
+    var compareSelectB = document.getElementById('compareSelectB');
+    var compareNameA = document.getElementById('compareNameA');
+    var compareNameB = document.getElementById('compareNameB');
+    var compareCategoryA = document.getElementById('compareCategoryA');
+    var compareCategoryB = document.getElementById('compareCategoryB');
+
+    var compareDiagramA = document.getElementById('compareDiagramA');
+    var compareDiagramB = document.getElementById('compareDiagramB');
+    var compareJewelryDiagramA = document.getElementById('compareJewelryDiagramA');
+    var compareJewelryDiagramB = document.getElementById('compareJewelryDiagramB');
+
+    var compareAngleA = document.getElementById('compareAngleA');
+    var compareAngleB = document.getElementById('compareAngleB');
+    var compareTissueA = document.getElementById('compareTissueA');
+    var compareTissueB = document.getElementById('compareTissueB');
+    var compareThicknessA = document.getElementById('compareThicknessA');
+    var compareThicknessB = document.getElementById('compareThicknessB');
+    var compareChannelDepthA = document.getElementById('compareChannelDepthA');
+    var compareChannelDepthB = document.getElementById('compareChannelDepthB');
+    var compareJewelryA = document.getElementById('compareJewelryA');
+    var compareJewelryB = document.getElementById('compareJewelryB');
+    var compareDownsizeA = document.getElementById('compareDownsizeA');
+    var compareDownsizeB = document.getElementById('compareDownsizeB');
+    var compareHealingA = document.getElementById('compareHealingA');
+    var compareHealingB = document.getElementById('compareHealingB');
+
+    var compareClearanceA = document.getElementById('compareClearanceA');
+    var compareClearanceB = document.getElementById('compareClearanceB');
+    var compareHazardA = document.getElementById('compareHazardA');
+    var compareHazardB = document.getElementById('compareHazardB');
+    var compareRefusalA = document.getElementById('compareRefusalA');
+    var compareRefusalB = document.getElementById('compareRefusalB');
+    var compareDiffGrid = document.getElementById('compareDiffGrid');
+
+    // 1. Dynamic Angle Visualizer DOM Elements
+    var angleRangeSlider = document.getElementById('angleRangeSlider');
+    var currentAngleBadge = document.getElementById('currentAngleBadge');
+    var anglePresetBtns = document.querySelectorAll('.v2-preset-pill');
+    var v2StatusBanner = document.getElementById('v2StatusBanner');
+    var v2StatusIcon = document.getElementById('v2StatusIcon');
+    var v2StatusText = document.getElementById('v2StatusText');
+    var v2SvgCanvasContainer = document.getElementById('v2SvgCanvasContainer');
+    var visualizerJewelryPills = document.getElementById('visualizerJewelryPills');
+    var resetAngleVisualizerBtn = document.getElementById('resetAngleVisualizerBtn');
+    var downloadAngleDiagramSvgBtn = document.getElementById('downloadAngleDiagramSvgBtn');
+    var downloadAngleDiagramPngBtn = document.getElementById('downloadAngleDiagramPngBtn');
+
+    var diagAngleDeviation = document.getElementById('diagAngleDeviation');
+    var diagToleranceDesc = document.getElementById('diagToleranceDesc');
+    var diagCompression = document.getElementById('diagCompression');
+    var diagCompressionDesc = document.getElementById('diagCompressionDesc');
+    var diagMigrationRisk = document.getElementById('diagMigrationRisk');
+    var diagMigrationDesc = document.getElementById('diagMigrationDesc');
+    var visualizerAnimateAngleBtn = document.getElementById('visualizerAnimateAngleBtn');
+    var visualizerAnimateIcon = document.getElementById('visualizerAnimateIcon');
+    var visualizerAnimateText = document.getElementById('visualizerAnimateText');
+
+    // 2. Caliper Thickness & Channel Depth Calculator DOM Elements
+    var caliperThicknessSlider = document.getElementById('caliperThicknessSlider');
+    var caliperThicknessBadge = document.getElementById('caliperThicknessBadge');
+    var thicknessPresetContainer = document.getElementById('thicknessPresetContainer');
+    var calcMeasuredThickness = document.getElementById('calcMeasuredThickness');
+    var calcChannelDepth = document.getElementById('calcChannelDepth');
+    var calcChannelFormula = document.getElementById('calcChannelFormula');
+
+    var toggleFineTuneBtn = document.getElementById('toggleFineTuneBtn');
+    var caliperFineTuneBar = document.getElementById('caliperFineTuneBar');
+    var stepperMinus05Btn = document.getElementById('stepperMinus05Btn');
+    var stepperMinus01Btn = document.getElementById('stepperMinus01Btn');
+    var stepperPlus01Btn = document.getElementById('stepperPlus01Btn');
+    var stepperPlus05Btn = document.getElementById('stepperPlus05Btn');
+    var caliperPrecisionInput = document.getElementById('caliperPrecisionInput');
+    var isFineTuneMode = false;
+
+    // 3. Why This Angle
+    var whyAngleClearanceContent = document.getElementById('whyAngleClearanceContent');
+    var badAngleHazardContent = document.getElementById('badAngleHazardContent');
+
+    // 4. Clinical Error Modes
+    var errorTabBtns = document.querySelectorAll('.error-tab-btn');
+    var errorSvgContainer = document.getElementById('errorSvgContainer');
+    var errorModeDescription = document.getElementById('errorModeDescription');
+
+    // 5. Bilateral Symmetry Caliper & Landmark Guide DOM Elements
+    var symmetryPairSelect = document.getElementById('symmetryPairSelect');
+    var symTabLandmarks = document.getElementById('symTabLandmarks');
+    var symTabSimulator = document.getElementById('symTabSimulator');
+    var symLandmarkPanel = document.getElementById('symLandmarkPanel') || document.getElementById('symLandmarksPanel');
+    var symSimulatorPanel = document.getElementById('symSimulatorPanel');
+
+    var symLandmarkSvgContainer = document.getElementById('symLandmarkSvgContainer') || document.getElementById('symmetryLandmarkSvgContainer');
+    var symLandmarkSteps = document.getElementById('symLandmarkSteps') || document.getElementById('symStepList');
+    var symLandmarkTitle = document.getElementById('symLandmarkTitle') || document.getElementById('symStepCardTitle');
+    var symDatumLabel = document.getElementById('symDatumLabel');
+    var symMeasDistance = document.getElementById('symMeasDistance');
+
+    var symToggleLandmarksBtn = document.getElementById('symToggleLandmarksBtn');
+    var symToggleCaliperBtn = document.getElementById('symToggleCaliperBtn');
+    var symToggleTargetsBtn = document.getElementById('symToggleTargetsBtn');
+
+    var symLeftAngleSlider = document.getElementById('symLeftAngleSlider');
+    var symLeftAngleBadge = document.getElementById('symLeftAngleBadge');
+    var symRightAngleSlider = document.getElementById('symRightAngleSlider');
+    var symRightAngleBadge = document.getElementById('symRightAngleBadge');
+    var symHeightOffsetSlider = document.getElementById('symHeightOffsetSlider');
+    var symHeightOffsetBadge = document.getElementById('symHeightOffsetBadge');
+    var symmetrySvgContainer = document.getElementById('symmetrySvgContainer');
+    var symStatusBanner = document.getElementById('symStatusBanner');
+    var symStatusText = document.getElementById('symStatusText');
+
+    var symOverlays = { landmarks: true, caliper: true, targets: true };
+
+    // 6. Core Anatomical Baseline Specs
+    var optimalAngle = document.getElementById('optimalAngle');
+    var insertionDepth = document.getElementById('insertionDepth');
+    var tissueType = document.getElementById('tissueType');
+    var healingTime = document.getElementById('healingTime');
+
+    // 7. Jewelry Specifications
+    var jewelryOptionsPills = document.getElementById('jewelryOptionsPills');
+    var jewelryType = document.getElementById('jewelryType');
+    var jewelryGauge = document.getElementById('jewelryGauge');
+    var jewelryLength = document.getElementById('jewelryLength');
+    var downsizeTime = document.getElementById('downsizeTime');
+    var jewelryOptionDescBox = document.getElementById('jewelryOptionDescBox');
+    var jewelryDiagramContainer = document.getElementById('jewelryDiagramContainer');
+
+    // 8. Positioning, Pitfalls, Refusal, Aftercare
+    var positioningContent = document.getElementById('positioningContent');
+    var techniqueContent = document.getElementById('techniqueContent');
+    var pitfallsContent = document.getElementById('pitfallsContent');
+    var refusalContent = document.getElementById('refusalContent');
+    var healingContent = document.getElementById('healingContent');
+
+    // 9. Actions (Print & Download PDF & Copy & JSON)
+    var downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    var print1PageSheetBtn = document.getElementById('print1PageSheetBtn');
+    var copySummaryBtn = document.getElementById('copySummaryBtn');
+    var downloadJsonBtn = document.getElementById('downloadJsonBtn');
+    var notesDownloadJsonBtn = document.getElementById('notesDownloadJsonBtn');
+    var mainDownloadJsonBtn = document.getElementById('mainDownloadJsonBtn');
+
+    // 10. Studio Preferences & House Standards Modal Elements
+    var openStudioPrefModalBtn = document.getElementById('openStudioPrefModalBtn');
+    var resetStudioPrefBtn = document.getElementById('resetStudioPrefBtn');
+    var studioPrefLabel = document.getElementById('studioPrefLabel');
+    var studioPrefModal = document.getElementById('studioPrefModal');
+    var closeStudioPrefModalBtn = document.getElementById('closeStudioPrefModalBtn');
+    var cancelStudioPrefBtn = document.getElementById('cancelStudioPrefBtn');
+    var studioPrefForm = document.getElementById('studioPrefForm');
+    var studioPrefModalPlacementName = document.getElementById('studioPrefModalPlacementName');
+    var houseGaugeSelect = document.getElementById('houseGaugeSelect');
+    var houseJewelryTypeSelect = document.getElementById('houseJewelryTypeSelect');
+    var houseNotesInput = document.getElementById('houseNotesInput');
+
+    function updateStudioPreferenceStatus() {
+      if (!studioPrefLabel) return;
+      var prefs = getStudioPreferences();
+      var pref = prefs[activePiercingKey];
+      var t = window.translate || function (k, p, d) { return d; };
+      if (pref) {
+        var houseLabel = t('nav.house_standards', null, 'House Standard');
+        studioPrefLabel.textContent = houseLabel + ' (' + (pref.gauge || 'Custom') + ')';
+        if (resetStudioPrefBtn) resetStudioPrefBtn.style.display = 'inline-block';
+      } else {
+        studioPrefLabel.textContent = t('common.global_clinical_baseline', null, 'Global Clinical Baseline');
+        if (resetStudioPrefBtn) resetStudioPrefBtn.style.display = 'none';
+      }
+    }
+
+    function openStudioPreferenceModal() {
+      if (!studioPrefModal) return;
+      var p = piercingData[activePiercingKey] || piercingData['earlobe'];
+      var t = window.translate || function (k, p, d) { return d; };
+
+      if (studioPrefModalPlacementName && p) {
+        var normKey = activePiercingKey.replace(/-/g, '_');
+        var localizedName = t('piercing.' + normKey + '.name', null, p.name || activePiercingKey);
+        studioPrefModalPlacementName.textContent = localizedName;
+      }
+
+      var prefs = getStudioPreferences();
+      var pref = prefs[activePiercingKey] || {};
+
+      if (houseGaugeSelect) {
+        houseGaugeSelect.value = pref.gauge || p.jewelryGauge || '16G';
+      }
+      if (houseJewelryTypeSelect) {
+        houseJewelryTypeSelect.value = pref.jewelryType || p.jewelryType || 'Flat-Back Labret (Threadless / Internally Threaded)';
+      }
+      if (houseNotesInput) {
+        houseNotesInput.value = pref.notes || '';
+      }
+
+      studioPrefModal.removeAttribute('hidden');
+      studioPrefModal.style.display = 'flex';
+    }
+
+    function closeStudioPreferenceModal() {
+      if (!studioPrefModal) return;
+      studioPrefModal.setAttribute('hidden', 'true');
+      studioPrefModal.style.display = 'none';
+    }
+
+    // 11. Reset All, Recent Piercings & Professional Notes Elements
+    var resetAllBtn = document.getElementById('resetAllBtn');
+    var recentPiercingsContainer = document.getElementById('recentPiercingsContainer');
+    var recentPiercingsList = document.getElementById('recentPiercingsList');
+    var professionalNotesArea = document.getElementById('professionalNotesArea');
+    var notesSaveStatus = document.getElementById('notesSaveStatus');
+    var clearNotesBtn = document.getElementById('clearNotesBtn');
+    var piercingSearchInput = document.getElementById('piercingSearch');
+
+    // -------------------------------------------------------------
+    // Unit System UI Updater
+    // -------------------------------------------------------------
+    function updateUnitUI() {
+      var isImperial = (currentUnit === 'imperial');
+      if (unitToggleText) {
+        unitToggleText.textContent = isImperial ? 'Imperial (inches)' : 'Metric (mm)';
+      }
+      if (unitToggleQuickText) {
+        unitToggleQuickText.textContent = isImperial ? 'Units: in' : 'Units: mm';
+      }
+    }
+
+    function toggleUnitSystem() {
+      currentUnit = (currentUnit === 'metric') ? 'imperial' : 'metric';
+      updateUnitUI();
+      saveWorkspaceState();
+      updateVisualizerAndCalculations();
+      updateBaselineSpecs();
+      updateSymmetryLandmarkUI();
+      if (isCompareMode) {
+        updateCompareWorkspace();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Core Synchronous UI Updater
+    // -------------------------------------------------------------
+    function updateVisualizerAndCalculations() {
+      var data = piercingData[activePiercingKey] || piercingData['earlobe'];
+      var curOpt = getActiveJewelryOption(activePiercingKey, activeJewelryOptionId);
+      var metrics = calculateChannelMetrics(activePiercingKey, currentMeasuredThickness, currentVisualizerAngle);
+
+      var dev = currentVisualizerAngle - 90;
+      var absDev = Math.abs(dev);
+
+      // A. Visualizer Card Updates
+      if (currentAngleBadge) {
+        currentAngleBadge.textContent = tr('visualizer.angle_badge_value', { angle: currentVisualizerAngle, dev: (dev > 0 ? '+' : '') + dev }, '{angle}° ({dev}° from perpendicular)');
+      }
+      if (angleRangeSlider) {
+        angleRangeSlider.value = currentVisualizerAngle;
+      }
+
+      if (v2SvgCanvasContainer) {
+        v2SvgCanvasContainer.innerHTML = renderV2InteractiveSvg(
+          activePiercingKey,
+          currentVisualizerAngle,
+          currentMeasuredThickness,
+          curOpt,
+          false
+        );
+      }
+
+      // Status Banner
+      if (v2StatusBanner) {
+        if (absDev === 0) {
+          v2StatusBanner.className = 'v2-status-banner v2-status-banner--optimal';
+          if (v2StatusIcon) v2StatusIcon.textContent = '✅';
+          if (v2StatusText) v2StatusText.textContent = tr('visualizer.status_straight', null, 'Straight through. Both discs sit flat on the skin.');
+        } else if (absDev <= 5) {
+          v2StatusBanner.className = 'v2-status-banner v2-status-banner--warning';
+          if (v2StatusIcon) v2StatusIcon.textContent = '⚠️';
+          if (v2StatusText) v2StatusText.textContent = tr('visualizer.status_slight', { dev: (dev > 0 ? '+' : '') + dev }, 'Tilted {dev}°. One disc edge starts to press into the skin, and swelling makes it worse.');
+        } else {
+          v2StatusBanner.className = 'v2-status-banner v2-status-banner--danger';
+          if (v2StatusIcon) v2StatusIcon.textContent = '🛑';
+          if (v2StatusText) v2StatusText.textContent = tr('visualizer.status_tilted', { dev: (dev > 0 ? '+' : '') + dev }, 'Tilted {dev}°. One disc edge presses in and the other lifts. Expect irritation bumps; the channel can migrate.');
+        }
+      }
+
+      // Diagnostic Cards
+      if (diagAngleDeviation) diagAngleDeviation.textContent = `${absDev}°`;
+      if (diagToleranceDesc) diagToleranceDesc.textContent = tr('visualizer.tolerance_value', { tol: data.angleTolerance || '±2°' }, 'Tolerance: {tol}');
+      var level = absDev === 0 ? 0 : (absDev <= 5 ? 1 : 2);
+      if (diagCompression) diagCompression.textContent = [tr('visualizer.contact_even', null, 'Even'), tr('visualizer.contact_slight', null, 'Slightly uneven'), tr('visualizer.contact_uneven', null, 'Uneven')][level];
+      if (diagCompressionDesc) diagCompressionDesc.textContent = [tr('visualizer.contact_even_desc', null, 'Discs sit flat on both sides'), tr('visualizer.contact_slight_desc', null, 'One disc edge presses harder'), tr('visualizer.contact_uneven_desc', null, 'One edge presses in, the other lifts')][level];
+      if (diagMigrationRisk) diagMigrationRisk.textContent = [tr('visualizer.align_straight', null, 'Straight'), tr('visualizer.align_slight', null, 'Slight tilt'), tr('visualizer.align_tilted', null, 'Tilted')][level];
+      if (diagMigrationDesc) diagMigrationDesc.textContent = [tr('visualizer.align_straight_desc', null, 'Jewelry can settle in line'), tr('visualizer.align_slight_desc', null, 'Can drift with swelling and wear'), tr('visualizer.align_tilted_desc', null, 'Pushes the jewelry sideways')][level];
+
+      // Update Preset Pills Highlight
+      anglePresetBtns.forEach(function (pill) {
+        var offset = parseInt(pill.getAttribute('data-angle-offset'), 10);
+        if (offset === dev) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+
+      // B. Caliper Depth Calculator Updates (Metric / Imperial Sensitive)
+      if (caliperThicknessBadge) {
+        caliperThicknessBadge.textContent = formatMm(metrics.measuredThickness, true);
+      }
+      if (caliperThicknessSlider) caliperThicknessSlider.value = currentMeasuredThickness;
+      if (caliperPrecisionInput && document.activeElement !== caliperPrecisionInput) {
+        caliperPrecisionInput.value = currentMeasuredThickness.toFixed(1);
+      }
+
+      if (calcMeasuredThickness) {
+        calcMeasuredThickness.textContent = formatMm(metrics.measuredThickness);
+      }
+      if (calcChannelDepth) {
+        calcChannelDepth.textContent = formatMm(metrics.channelDepth);
+      }
+      if (calcChannelFormula) {
+        calcChannelFormula.textContent = absDev === 0 ? tr('visualizer.formula_straight', null, 'Straight through: equal to the tissue') : tr('visualizer.formula_tilted', { dev: absDev }, 'Longer because of the {dev}° tilt');
+      }
+
+      // Update Thickness Presets Active State
+      var thickPills = thicknessPresetContainer ? thicknessPresetContainer.querySelectorAll('.v2-preset-pill') : [];
+      thickPills.forEach(function (p) {
+        var val = parseFloat(p.getAttribute('data-thickness'));
+        if (Math.abs(val - currentMeasuredThickness) < 0.1) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+
+    }
+
+    function updateBaselineSpecs() {
+      var data = piercingData[activePiercingKey] || piercingData['earlobe'];
+      if (optimalAngle) optimalAngle.textContent = data.optimalAngle;
+      if (insertionDepth) {
+        var tRange = data.tissueThicknessRange || [4.0, 8.0, 5.0];
+        insertionDepth.textContent = formatRangeUnit(tRange[0], tRange[1], tRange[2]);
+      }
+      if (tissueType) tissueType.textContent = data.tissueType;
+      if (healingTime) healingTime.textContent = data.healingTime;
+    }
+
+    // -------------------------------------------------------------
+    // Populate & Render Compare Mode Side-by-Side Workspace
+    // -------------------------------------------------------------
+    function populateCompareSelects() {
+      if (!compareSelectA || !compareSelectB) return;
+
+      var pData = (typeof window !== 'undefined' && window.PIERCING_DATA && Object.keys(window.PIERCING_DATA).length > 0) ? window.PIERCING_DATA : (piercingData || {});
+      var categories = {};
+      var t = window.translate || function (k, p, fb) { return fb || k; };
+
+      Object.keys(pData).forEach(function (k) {
+        var p = pData[k];
+        var rawCat = p.category || 'Other';
+        var normKey = k.replace(/-/g, '_');
+        var catName = t('piercing.' + normKey + '.category', null, rawCat);
+        var pName = t('piercing.' + normKey + '.name', null, p.name || k);
+
+        if (!categories[rawCat]) {
+          categories[rawCat] = { label: catName, items: [] };
+        }
+        categories[rawCat].items.push({ key: k, name: pName });
+      });
+
+      var buildOptionsHtml = function (selectedKey) {
+        var html = '';
+        Object.keys(categories).forEach(function (cat) {
+          html += '<optgroup label="' + categories[cat].label + '">';
+          categories[cat].items.forEach(function (item) {
+            var sel = (item.key === selectedKey) ? ' selected' : '';
+            html += '<option value="' + item.key + '"' + sel + '>' + item.name + '</option>';
+          });
+          html += '</optgroup>';
+        });
+        return html;
+      };
+
+      compareSelectA.innerHTML = buildOptionsHtml(comparePiercingKeyA);
+      compareSelectB.innerHTML = buildOptionsHtml(comparePiercingKeyB);
+      if (comparePiercingKeyA) compareSelectA.value = comparePiercingKeyA;
+      if (comparePiercingKeyB) compareSelectB.value = comparePiercingKeyB;
+    }
+
+    function updateCompareWorkspace() {
+      var pData = (typeof window !== 'undefined' && window.PIERCING_DATA && Object.keys(window.PIERCING_DATA).length > 0) ? window.PIERCING_DATA : (piercingData || {});
+      var dataA = pData[comparePiercingKeyA] || pData['earlobe'];
+      var dataB = pData[comparePiercingKeyB] || pData['helix'];
+      var t = window.translate || function (k, p, fb) { return fb || k; };
+
+      if (compareSelectA && compareSelectA.options.length === 0) {
+        populateCompareSelects();
+      }
+
+      var normA = comparePiercingKeyA.replace(/-/g, '_');
+      var normB = comparePiercingKeyB.replace(/-/g, '_');
+
+      var nameA = t('piercing.' + normA + '.name', null, dataA.name);
+      var catA = t('piercing.' + normA + '.category', null, dataA.category || 'Piercing');
+      var angleA = t('piercing.' + normA + '.optimalAngle', null, dataA.optimalAngle);
+      var tissueA = t('piercing.' + normA + '.tissueType', null, dataA.tissueType);
+      var healingA = t('piercing.' + normA + '.healingTime', null, dataA.healingTime);
+      var clearanceA = t('piercing.' + normA + '.whyThisAngle', null, dataA.whyThisAngle);
+      var hazardA = t('piercing.' + normA + '.badAngleConsequence', null, dataA.badAngleConsequence);
+      var refuseA = t('piercing.' + normA + '.refuse', null, dataA.refuse);
+
+      var nameB = t('piercing.' + normB + '.name', null, dataB.name);
+      var catB = t('piercing.' + normB + '.category', null, dataB.category || 'Piercing');
+      var angleB = t('piercing.' + normB + '.optimalAngle', null, dataB.optimalAngle);
+      var tissueB = t('piercing.' + normB + '.tissueType', null, dataB.tissueType);
+      var healingB = t('piercing.' + normB + '.healingTime', null, dataB.healingTime);
+      var clearanceB = t('piercing.' + normB + '.whyThisAngle', null, dataB.whyThisAngle);
+      var hazardB = t('piercing.' + normB + '.badAngleConsequence', null, dataB.badAngleConsequence);
+      var refuseB = t('piercing.' + normB + '.refuse', null, dataB.refuse);
+
+      var tRangeA = dataA.tissueThicknessRange || [4.0, 8.0, 5.0];
+      var tRangeB = dataB.tissueThicknessRange || [1.0, 2.5, 1.5];
+
+      var metricsA = calculateChannelMetrics(comparePiercingKeyA, tRangeA[2], 90);
+      var metricsB = calculateChannelMetrics(comparePiercingKeyB, tRangeB[2], 90);
+
+      var curOptA = getActiveJewelryOption(comparePiercingKeyA, null);
+      var curOptB = getActiveJewelryOption(comparePiercingKeyB, null);
+
+      // Render Column A
+      if (compareNameA) compareNameA.textContent = nameA;
+      if (compareCategoryA) compareCategoryA.textContent = catA;
+      if (compareDiagramA) {
+        compareDiagramA.innerHTML = renderV2InteractiveSvg(comparePiercingKeyA, 90, tRangeA[2], curOptA);
+      }
+      if (compareJewelryDiagramA) {
+        compareJewelryDiagramA.innerHTML = renderJewelry3D(dataA, curOptA);
+      }
+      if (compareAngleA) compareAngleA.textContent = `${angleA} (${dataA.angleTolerance || '±2°'})`;
+      if (compareTissueA) compareTissueA.textContent = tissueA;
+      if (compareThicknessA) compareThicknessA.textContent = formatRangeUnit(tRangeA[0], tRangeA[1], tRangeA[2]);
+      if (compareChannelDepthA) compareChannelDepthA.textContent = formatMm(metricsA.channelDepth);
+      if (compareJewelryA) {
+        var jNameA = curOptA ? curOptA.name : dataA.jewelryType;
+        var jGA = curOptA ? curOptA.gauge : dataA.jewelryGauge;
+        compareJewelryA.textContent = `${jGA} (${jNameA})`;
+      }
+      if (compareDownsizeA) compareDownsizeA.textContent = dataA.downsizeTime || '';
+      if (compareHealingA) compareHealingA.textContent = healingA;
+      if (compareClearanceA) compareClearanceA.innerHTML = `<p>${clearanceA}</p>`;
+      if (compareHazardA) compareHazardA.innerHTML = `<p>${hazardA}</p>`;
+      if (compareRefusalA) compareRefusalA.innerHTML = refuseA || '<p>Standard contraindications apply.</p>';
+
+      // Render Column B
+      if (compareNameB) compareNameB.textContent = nameB;
+      if (compareCategoryB) compareCategoryB.textContent = catB;
+      if (compareDiagramB) {
+        compareDiagramB.innerHTML = renderV2InteractiveSvg(comparePiercingKeyB, 90, tRangeB[2], curOptB);
+      }
+      if (compareJewelryDiagramB) {
+        compareJewelryDiagramB.innerHTML = renderJewelry3D(dataB, curOptB);
+      }
+      if (compareAngleB) compareAngleB.textContent = `${angleB} (${dataB.angleTolerance || '±2°'})`;
+      if (compareTissueB) compareTissueB.textContent = tissueB;
+      if (compareThicknessB) compareThicknessB.textContent = formatRangeUnit(tRangeB[0], tRangeB[1], tRangeB[2]);
+      if (compareChannelDepthB) compareChannelDepthB.textContent = formatMm(metricsB.channelDepth);
+      if (compareJewelryB) {
+        var jNameB = curOptB ? curOptB.name : dataB.jewelryType;
+        var jGB = curOptB ? curOptB.gauge : dataB.jewelryGauge;
+        compareJewelryB.textContent = `${jGB} (${jNameB})`;
+      }
+      if (compareDownsizeB) compareDownsizeB.textContent = dataB.downsizeTime || '';
+      if (compareHealingB) compareHealingB.textContent = healingB;
+      if (compareClearanceB) compareClearanceB.innerHTML = `<p>${clearanceB}</p>`;
+      if (compareHazardB) compareHazardB.innerHTML = `<p>${hazardB}</p>`;
+      if (compareRefusalB) compareRefusalB.innerHTML = refuseB || '<p>Standard contraindications apply.</p>';
+
+      // Render Differential Contrast Matrix
+      if (compareDiffGrid) {
+        var diffAngle = (dataA.optimalAngle === dataB.optimalAngle) ?
+          t('compare.both_perpendicular_msg', { angle: angleA }, `Both share standard ${angleA} perpendicular baseline trajectory.`) :
+          t('compare.vector_disparity_msg', { nameA: nameA, angleA: angleA, nameB: nameB, angleB: angleB }, `Vector disparity: ${nameA} (${angleA}) vs ${nameB} (${angleB}).`);
+
+        var diffTissue = `<strong>${nameA}:</strong> ${tissueA}<br>vs<br><strong>${nameB}:</strong> ${tissueB}`;
+
+        var depthDiffMm = (parseFloat(metricsA.channelDepth) - parseFloat(metricsB.channelDepth)).toFixed(1);
+        var depthDiffText = (depthDiffMm == 0) ?
+          t('compare.equal_depth_msg', { depth: formatMm(metricsA.channelDepth) }, `Equal average channel depth of ${formatMm(metricsA.channelDepth)}.`) :
+          (depthDiffMm > 0 ?
+            t('compare.channel_longer_msg', { nameA: nameA, diff: formatMm(Math.abs(depthDiffMm)), nameB: nameB }, `${nameA} channel is ${formatMm(Math.abs(depthDiffMm))} longer than ${nameB}.`) :
+            t('compare.channel_shorter_msg', { nameA: nameA, diff: formatMm(Math.abs(depthDiffMm)), nameB: nameB }, `${nameA} channel is ${formatMm(Math.abs(depthDiffMm))} shorter than ${nameB}.`));
+
+
+        var hazardLabelA = dataA.badAngleConsequence ? hazardA : t('compare.pressure_necrosis_risk', null, 'Pressure necrosis / migration');
+        var hazardLabelB = dataB.badAngleConsequence ? hazardB : t('compare.hypertrophic_notch_risk', null, 'Hypertrophic scar / cartilage notch');
+
+        compareDiffGrid.innerHTML = `
+          <div class="compare-diff-item">
+            <span class="compare-diff-item__label">${t('compare.vector_geometry_contrast', null, '📐 Vector Geometry Contrast')}</span>
+            <span class="compare-diff-item__value">${diffAngle}</span>
+          </div>
+          <div class="compare-diff-item">
+            <span class="compare-diff-item__label">${t('compare.histological_vascular_delta', null, '🔬 Histological & Vascular Delta')}</span>
+            <span class="compare-diff-item__value">${diffTissue}</span>
+          </div>
+          <div class="compare-diff-item">
+            <span class="compare-diff-item__label">${t('compare.channel_depth_difference', null, '📏 Channel Depth Difference')}</span>
+            <span class="compare-diff-item__value">${depthDiffText}</span>
+          </div>
+          <div class="compare-diff-item">
+            <span class="compare-diff-item__label">${t('compare.healing_duration_delta', null, '⏱️ Healing Duration Delta')}</span>
+            <span class="compare-diff-item__value"><strong>${nameA}:</strong> ${healingA}<br><strong>${nameB}:</strong> ${healingB}</span>
+          </div>
+          <div class="compare-diff-item">
+            <span class="compare-diff-item__label">${t('compare.primary_clinical_risk', null, '⚠️ Primary Clinical Risk Factor')}</span>
+            <span class="compare-diff-item__value"><strong>${nameA}:</strong> ${hazardLabelA}<br><strong>${nameB}:</strong> ${hazardLabelB}</span>
+          </div>
+        `;
+      }
+    }
+
+    function setCompareMode(active, scrollTo) {
+      isCompareMode = active;
+      saveWorkspaceState();
+
+      if (isCompareMode) {
+        if (compareModeToggleBtn) {
+          compareModeToggleBtn.classList.add('active');
+          compareModeToggleBtn.setAttribute('aria-pressed', 'true');
+        }
+        if (compareWorkspace) compareWorkspace.removeAttribute('hidden');
+        if (piercingDetails) piercingDetails.setAttribute('hidden', '');
+        populateCompareSelects();
+        updateCompareWorkspace();
+        if (scrollTo && compareWorkspace) {
+          compareWorkspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else {
+        if (compareModeToggleBtn) {
+          compareModeToggleBtn.classList.remove('active');
+          compareModeToggleBtn.setAttribute('aria-pressed', 'false');
+        }
+        if (compareWorkspace) compareWorkspace.setAttribute('hidden', '');
+        if (piercingDetails) piercingDetails.removeAttribute('hidden');
+        selectPiercing(activePiercingKey, scrollTo);
+      }
+    }
+
+    function generateAndPrintComparisonSheet() {
+      var dataA = piercingData[comparePiercingKeyA] || piercingData['earlobe'];
+      var dataB = piercingData[comparePiercingKeyB] || piercingData['helix'];
+      var tRangeA = dataA.tissueThicknessRange || [4.0, 8.0, 5.0];
+      var tRangeB = dataB.tissueThicknessRange || [1.0, 2.5, 1.5];
+      var metricsA = calculateChannelMetrics(comparePiercingKeyA, tRangeA[2], 90);
+      var metricsB = calculateChannelMetrics(comparePiercingKeyB, tRangeB[2], 90);
+
+      var printDate = document.getElementById('printSheetDate');
+      var printCategory = document.getElementById('printSheetCategory');
+      var printTitle = document.getElementById('printSheetTitle');
+      var printHouseBadge = document.getElementById('printSheetHouseBadge');
+      var printDiagram = document.getElementById('printSheetDiagramContainer');
+      var printJewelryDiagram = document.getElementById('printSheetJewelryDiagramContainer');
+      var printAngle = document.getElementById('printSheetAngle');
+      var printDepth = document.getElementById('printSheetDepth');
+      var printThickness = document.getElementById('printSheetThickness');
+      var printJewelry = document.getElementById('printSheetJewelry');
+      var printDownsize = document.getElementById('printSheetDownsize');
+      var printClearance = document.getElementById('printSheetClearance');
+      var printTechniqueSummary = document.getElementById('printSheetTechniqueSummary');
+      var printRefusal = document.getElementById('printSheetRefusal');
+
+      var dateStr = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+
+      if (printDate) printDate.textContent = dateStr;
+      if (printCategory) printCategory.textContent = window.translate ? window.translate('guide.comp_geometry', null, 'COMPARATIVE CLINICAL GEOMETRY') : 'COMPARATIVE CLINICAL GEOMETRY';
+      if (printTitle) printTitle.textContent = `${dataA.name} vs ${dataB.name} Comparative Protocol`;
+      if (printHouseBadge) printHouseBadge.textContent = `Units: ${currentUnit === 'imperial' ? 'Imperial (inches)' : 'Metric (mm)'}`;
+
+      if (printDiagram) {
+        printDiagram.innerHTML = `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+            <div>
+              <div style="font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px;">${dataA.name.toUpperCase()} (90°)</div>
+              ${renderV2InteractiveSvg(comparePiercingKeyA, 90, tRangeA[2], null)}
+            </div>
+            <div>
+              <div style="font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px;">${dataB.name.toUpperCase()} (90°)</div>
+              ${renderV2InteractiveSvg(comparePiercingKeyB, 90, tRangeB[2], null)}
+            </div>
+          </div>
+        `;
+      }
+
+      if (printJewelryDiagram) {
+        printJewelryDiagram.innerHTML = `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+            <div>${renderJewelry3D(dataA, null)}</div>
+            <div>${renderJewelry3D(dataB, null)}</div>
+          </div>
+        `;
+      }
+
+      if (printAngle) printAngle.textContent = `${dataA.name}: ${dataA.optimalAngle} | ${dataB.name}: ${dataB.optimalAngle}`;
+      if (printDepth) printDepth.textContent = `${dataA.name}: ${formatMm(metricsA.channelDepth)} | ${dataB.name}: ${formatMm(metricsB.channelDepth)}`;
+      if (printThickness) printThickness.textContent = `${dataA.name}: ${formatRangeUnit(tRangeA[0], tRangeA[1], tRangeA[2])} vs ${dataB.name}: ${formatRangeUnit(tRangeB[0], tRangeB[1], tRangeB[2])}`;
+      if (printJewelry) printJewelry.textContent = `${dataA.name}: ${dataA.jewelryGauge} vs ${dataB.name}: ${dataB.jewelryGauge}`;
+      if (printDownsize) printDownsize.textContent = `${dataA.name}: ${dataA.downsizeTime} vs ${dataB.name}: ${dataB.downsizeTime}`;
+
+      if (printClearance) {
+        printClearance.innerHTML = `
+          <p><strong>${dataA.name}:</strong> ${dataA.whyThisAngle}</p>
+          <p><strong>${dataB.name}:</strong> ${dataB.whyThisAngle}</p>
+        `;
+      }
+      if (printTechniqueSummary) {
+        printTechniqueSummary.innerHTML = `
+          <p><strong>${dataA.name} Off-Angle Hazard:</strong> ${dataA.badAngleConsequence}</p>
+          <p><strong>${dataB.name} Off-Angle Hazard:</strong> ${dataB.badAngleConsequence}</p>
+        `;
+      }
+      if (printRefusal) {
+        printRefusal.innerHTML = `
+          <p><strong>${dataA.name} Contraindications:</strong> ${dataA.refuse || 'Standard check'}</p>
+          <p><strong>${dataB.name} Contraindications:</strong> ${dataB.refuse || 'Standard check'}</p>
+        `;
+      }
+
+      window.print();
+    }
+
+    // -------------------------------------------------------------
+    // Render Jewelry Options in Pills
+    // -------------------------------------------------------------
+    function updateJewelryUI() {
+      var options = jewelryOptions[activePiercingKey] || [];
+      var curOpt = getActiveJewelryOption(activePiercingKey, activeJewelryOptionId);
+      var data = piercingData[activePiercingKey] || piercingData['earlobe'];
+
+      function buildPillHtml(targetContainer) {
+        if (!targetContainer) return;
+        if (options.length === 0) {
+          targetContainer.innerHTML = '<span class="text-muted">Standard initial jewelry configuration</span>';
+          return;
+        }
+        var html = '';
+        options.forEach(function (opt) {
+          var isSelected = (curOpt && curOpt.id === opt.id);
+          var badge = opt.isInitialStandard ? '<span class="jewelry-pill-badge initial">Initial Std</span>' : '<span class="jewelry-pill-badge healed">Healed Alt</span>';
+          html += `
+            <button type="button" class="jewelry-option-pill ${isSelected ? 'active' : ''}" data-jewelry-id="${opt.id}" aria-label="Select ${opt.name}">
+              <span class="pill-name">${opt.name}</span>
+              ${badge}
+            </button>
+          `;
+        });
+        targetContainer.innerHTML = html;
+
+        // Attach Click Listener to Pills
+        var pills = targetContainer.querySelectorAll('.jewelry-option-pill');
+        pills.forEach(function (p) {
+          p.addEventListener('click', function () {
+            activeJewelryOptionId = this.getAttribute('data-jewelry-id');
+            updateJewelryUI();
+            updateVisualizerAndCalculations();
+          });
+        });
+      }
+
+      // Populate both pill containers
+      buildPillHtml(visualizerJewelryPills);
+      buildPillHtml(jewelryOptionsPills);
+
+      // Update Specs Grid
+      if (curOpt) {
+        if (jewelryType) jewelryType.textContent = curOpt.name;
+        if (jewelryGauge) jewelryGauge.textContent = curOpt.gauge;
+        if (jewelryLength) jewelryLength.textContent = curOpt.length;
+        if (downsizeTime) downsizeTime.textContent = curOpt.downsize;
+        if (jewelryOptionDescBox) {
+          jewelryOptionDescBox.innerHTML = `<strong>Clinical Rationale:</strong> ${curOpt.description}`;
+        }
+      } else {
+        var prefs = getStudioPreferences();
+        var pref = prefs[activePiercingKey];
+        if (jewelryType) jewelryType.textContent = (pref && pref.jewelryType) || data.jewelryType;
+        if (jewelryGauge) jewelryGauge.textContent = (pref && pref.gauge) || data.jewelryGauge;
+        if (jewelryLength) jewelryLength.textContent = data.jewelryLength;
+        if (downsizeTime) downsizeTime.textContent = data.downsizeTime;
+        if (jewelryOptionDescBox) {
+          if (pref && pref.notes) {
+            jewelryOptionDescBox.innerHTML = `<strong>Studio House Standard:</strong> ${pref.notes}`;
+          } else {
+            jewelryOptionDescBox.innerHTML = `<strong>Clinical Standard:</strong> ${data.jewelryType}`;
+          }
+        }
+      }
+
+      // Re-render 3D CAD Diagram
+      if (jewelryDiagramContainer) {
+        jewelryDiagramContainer.innerHTML = renderJewelry3D(data, curOpt);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Render Clinical Error Modes Comparator
+    // -------------------------------------------------------------
+    function updateErrorModeUI(mode) {
+      var activeMode = mode || 'optimal';
+      var t = window.translate || function (k, p, d) { return d; };
+      var descriptions = {
+        'optimal': '<strong>' + t('visualizer.err_optimal_title', null, '✅ Optimal Perpendicular Alignment') + ':</strong> ' + t('visualizer.err_optimal_desc', null, 'The needle enters and exits at precisely 90° to the anatomical plane. Both anterior and posterior discs sit completely flush against the epidermal surface, distributing hydrostatic pressure uniformly with zero localized shear strain.'),
+        'shallow': '<strong>' + t('visualizer.err_shallow_title', null, '⚠️ Shallow Insertion Error') + ':</strong> ' + t('visualizer.err_shallow_desc', null, 'Entering at a shallow diagonal angle (-15°) elongates the fistula channel and causes the superior edge of the backing disc to bite into the dermis. This localized pressure triggers collagen hyperplasia and chronic hypertrophic bumps.'),
+        'steep': '<strong>' + t('visualizer.err_steep_title', null, '🛑 Steep / Off-Axis Incline Error') + ':</strong> ' + t('visualizer.err_steep_desc', null, 'A steep trajectory (+15°) forces the opposite disc edge to dig deeply into the tissue, creating high shear forces that cause the jewelry to migrate over time toward the path of least resistance.'),
+        'asymmetric': '<strong>' + t('visualizer.err_asym_title', null, '⚠️ Bilateral Asymmetric Skew') + ':</strong> ' + t('visualizer.err_asym_desc', null, 'Different entry/exit vectors on paired piercings create optical dissonance, uneven downward hang under gravity, and asymmetric friction during daily activity and sleep.')
+      };
+
+      if (errorSvgContainer) {
+        errorSvgContainer.innerHTML = renderErrorModeSvg(activeMode, activePiercingKey);
+      }
+      if (errorModeDescription) {
+        errorModeDescription.innerHTML = descriptions[activeMode] || descriptions['optimal'];
+      }
+
+      errorTabBtns.forEach(function (btn) {
+        if (btn.getAttribute('data-error-mode') === activeMode) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Render Bilateral Symmetry Caliper & Landmark Placement Guide
+    // -------------------------------------------------------------
+    function updateSymmetryLandmarkUI() {
+      var pairType = symmetryPairSelect ? symmetryPairSelect.value : 'lobes';
+      var t = window.translate || function (k, p, d) { return d; };
+
+      // 1. Render Interactive SVG
+      if (symLandmarkSvgContainer) {
+        symLandmarkSvgContainer.innerHTML = renderSymmetryLandmarkSvg(pairType, symOverlays);
+      }
+
+      // 2. Update Protocol Header Labels
+      var titles = {
+        'lobes': {
+          name: t('visualizer.sym_lobes_name', null, 'Earlobes Bilateral Reference'),
+          datum: t('visualizer.sym_lobes_datum', null, 'Inter-Tragal Notch Plane (Datum A)'),
+          dist: t('visualizer.sym_lobes_dist', null, '16.5 mm (Tragus to Center)')
+        },
+        'nostrils': {
+          name: t('visualizer.sym_nostrils_name', null, 'Nostrils Bilateral Reference'),
+          datum: t('visualizer.sym_nostrils_datum', null, 'Alar-Facial Crease Baseline'),
+          dist: t('visualizer.sym_nostrils_dist', null, '7.0 mm (Crease to Apex)')
+        },
+        'high-nostrils': {
+          name: t('visualizer.sym_high_nostrils_name', null, 'High Nostrils Supra-Alar Reference'),
+          datum: t('visualizer.sym_high_nostrils_datum', null, 'Nasion / Interpupillary Plane'),
+          dist: t('visualizer.sym_high_nostrils_dist', null, '14.0 mm from Alar Rim')
+        },
+        'eyebrows': {
+          name: t('visualizer.sym_eyebrows_name', null, 'Eyebrows Ridge Reference'),
+          datum: t('visualizer.sym_eyebrows_datum', null, 'Lateral Orbital Rim / Canthus'),
+          dist: t('visualizer.sym_eyebrows_dist', null, '12.0 mm (Canthus to Axis)')
+        },
+        'snake-bites': {
+          name: t('visualizer.sym_snake_bites_name', null, 'Snake Bites (Lower Lip) Reference'),
+          datum: t('visualizer.sym_snake_bites_datum', null, 'Vermilion Border & Commissure'),
+          dist: t('visualizer.sym_snake_bites_dist', null, '12.5 mm Inward from Corner')
+        },
+        'nipples': {
+          name: t('visualizer.sym_nipples_name', null, 'Nipples Horizontal Reference'),
+          datum: t('visualizer.sym_nipples_datum', null, 'Sternal Midline & Inframammary Level'),
+          dist: t('visualizer.sym_nipples_dist', null, 'Transverse Coronal Axis')
+        },
+        'helix-flat': {
+          name: t('visualizer.sym_helix_flat_name', null, 'Auricular Flat / Helix Reference'),
+          datum: t('visualizer.sym_helix_flat_datum', null, 'Superior Auricular Ridge & Scapha'),
+          dist: t('visualizer.sym_helix_flat_dist', null, '6.5 mm Outer Rim Clearance')
+        }
+      };
+
+      var info = titles[pairType] || titles['lobes'];
+      if (symLandmarkTitle) symLandmarkTitle.textContent = info.name;
+      if (symDatumLabel) symDatumLabel.textContent = info.datum;
+      if (symMeasDistance) symMeasDistance.textContent = info.dist;
+
+      // 3. Render Step-by-Step Clinical Protocol for Junior Piercers
+      if (symLandmarkSteps) {
+        var steps = getSymmetryStepsData(pairType);
+        var stepsHtml = '';
+        steps.forEach(function (st) {
+          stepsHtml += `
+            <div style="display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.65rem;">
+              <span class="clinical-step-pill">${st.num}</span>
+              <div style="font-size: 0.88rem; line-height: 1.45;">
+                <strong style="color: var(--text-primary);">${st.title}</strong>
+                <span style="color: var(--text-secondary); margin-left: 0.25rem;">${st.text}</span>
+              </div>
+            </div>
+          `;
+        });
+        symLandmarkSteps.innerHTML = stepsHtml;
+      }
+    }
+
+    function updateSymmetryUI() {
+      var pairType = symmetryPairSelect ? symmetryPairSelect.value : 'lobes';
+      var lAngle = symLeftAngleSlider ? parseFloat(symLeftAngleSlider.value) : 90;
+      var rAngle = symRightAngleSlider ? parseFloat(symRightAngleSlider.value) : 90;
+      var offset = symHeightOffsetSlider ? parseFloat(symHeightOffsetSlider.value) : 0.0;
+
+      // Update Landmark Guide
+      updateSymmetryLandmarkUI();
+
+      // Update Simulator Badges
+      if (symLeftAngleBadge) symLeftAngleBadge.textContent = `${lAngle}°`;
+      if (symRightAngleBadge) symRightAngleBadge.textContent = `${rAngle}°`;
+      if (symHeightOffsetBadge) symHeightOffsetBadge.textContent = `${offset > 0 ? '+' : ''}${offset.toFixed(1)} mm`;
+
+      // Render Vector Simulator SVG
+      if (symmetrySvgContainer) {
+        symmetrySvgContainer.innerHTML = renderSymmetrySvg(pairType, lAngle, rAngle, offset);
+      }
+
+      var delta = Math.abs(lAngle - rAngle).toFixed(1);
+      var isPerfect = (delta <= 1.0 && Math.abs(offset) < 0.5);
+
+      if (symStatusBanner) {
+        if (isPerfect) {
+          symStatusBanner.className = 'v2-status-banner v2-status-banner--optimal';
+          if (symStatusText) symStatusText.textContent = tr('ui.symmetrical_angle_difference_delta_height_offset', { delta: delta, offset: offset.toFixed(1) }, 'Symmetrical: angle difference {delta}°, height offset {offset} mm.');
+        } else if (Math.abs(offset) >= 1.5) {
+          symStatusBanner.className = 'v2-status-banner v2-status-banner--danger';
+          if (symStatusText) symStatusText.textContent = `Significant Step Height Offset (${offset > 0 ? '+' : ''}${offset.toFixed(1)}mm)! Unbalanced optical level across datum plane.`;
+        } else {
+          symStatusBanner.className = 'v2-status-banner v2-status-banner--warning';
+          if (symStatusText) symStatusText.textContent = `Angular Divergence Delta of ${delta}° detected. Asymmetric hang will be noticeable on resting posture.`;
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Printable / Download as PDF Placement Sheet Generator
+    // -------------------------------------------------------------
+    function generateAndPrintClinicalSheet() {
+      var data = piercingData[activePiercingKey] || piercingData['earlobe'];
+      var curOpt = getActiveJewelryOption(activePiercingKey, activeJewelryOptionId);
+      var metrics = calculateChannelMetrics(activePiercingKey, currentMeasuredThickness, currentVisualizerAngle);
+
+      var printDate = document.getElementById('printSheetDate');
+      var printCategory = document.getElementById('printSheetCategory');
+      var printTitle = document.getElementById('printSheetTitle');
+      var printHouseBadge = document.getElementById('printSheetHouseBadge');
+      var printDiagram = document.getElementById('printSheetDiagramContainer');
+      var printJewelryDiagram = document.getElementById('printSheetJewelryDiagramContainer');
+      var printAngle = document.getElementById('printSheetAngle');
+      var printDepth = document.getElementById('printSheetDepth');
+      var printThickness = document.getElementById('printSheetThickness');
+      var printJewelry = document.getElementById('printSheetJewelry');
+      var printDownsize = document.getElementById('printSheetDownsize');
+      var printClearance = document.getElementById('printSheetClearance');
+      var printTechniqueSummary = document.getElementById('printSheetTechniqueSummary');
+      var printRefusal = document.getElementById('printSheetRefusal');
+      var printHouseNotes = document.getElementById('printHouseNotes') || document.getElementById('printSheetHouseNotes');
+      var printCareNotes = document.getElementById('printSheetCareNotes');
+
+      var dateStr = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+
+      if (printDate) printDate.textContent = dateStr;
+      if (printCategory) printCategory.textContent = (data.category || 'CLINICAL PIERCING PROTOCOL').toUpperCase();
+      if (printTitle) printTitle.textContent = `${data.name} Specification & Placement Protocol`;
+      if (printHouseBadge) {
+        var house = getStudioPreferences()[activePiercingKey];
+        printHouseBadge.textContent = house ? tr('print.house_standard', { gauge: house.gauge }, 'House Standard: {gauge}') : tr('print.global_baseline', null, 'Protocol: Standard Global Clinical Baseline');
+      }
+
+      // Inject Cross-Section SVG Diagram (with ink-free high-legibility print mode)
+      if (printDiagram) {
+        printDiagram.innerHTML = renderV2InteractiveSvg(activePiercingKey, 90, currentMeasuredThickness, curOpt, true);
+      }
+
+      // Populate Large Room-Legible Hero Metric Strip for Procedure Room
+      var printHeroAngle = document.getElementById('printHeroAngle');
+      var printHeroAngleSub = document.getElementById('printHeroAngleSub');
+      var printHeroDepth = document.getElementById('printHeroDepth');
+      var printHeroDepthSub = document.getElementById('printHeroDepthSub');
+      var printHeroPost = document.getElementById('printHeroPost');
+      var printHeroPostSub = document.getElementById('printHeroPostSub');
+      var printHeroGauge = document.getElementById('printHeroGauge');
+      var printHeroGaugeSub = document.getElementById('printHeroGaugeSub');
+      var printHeroDownsize = document.getElementById('printHeroDownsize');
+      var printHeroDownsizeSub = document.getElementById('printHeroDownsizeSub');
+
+      if (printHeroAngle) printHeroAngle.textContent = data.optimalAngle || '90°';
+      if (printHeroAngleSub) printHeroAngleSub.textContent = `Normal (${data.angleTolerance || '±2°'})`;
+      if (printHeroDepth) printHeroDepth.textContent = `${metrics.channelDepth} mm`;
+      if (printHeroDepthSub) printHeroDepthSub.textContent = window.translate ? window.translate('guide.full_tissue_thickness', null, 'Full Tissue Thickness') : 'Full Tissue Thickness';
+      if (printHeroPost) printHeroPost.textContent = curOpt ? curOpt.length : data.jewelryLength;
+      if (printHeroPostSub) printHeroPostSub.textContent = tr('print.typical_starting_length', null, 'Typical starting length');
+      if (printHeroGauge) printHeroGauge.textContent = curOpt ? curOpt.gauge : data.jewelryGauge;
+      if (printHeroGaugeSub) printHeroGaugeSub.textContent = curOpt && curOpt.gaugeMm ? `${curOpt.gaugeMm} mm Post` : '1.2 mm Post';
+      if (printHeroDownsize) printHeroDownsize.textContent = data.downsizeTime || '';
+      if (printHeroDownsizeSub) printHeroDownsizeSub.textContent = tr('print.downsize_timing', null, 'Typical downsize timing');
+
+      // Inject 3D Jewelry CAD Diagram
+      if (printJewelryDiagram) {
+        printJewelryDiagram.innerHTML = renderJewelry3D(data, curOpt);
+      }
+
+      // Fill Technical Specifications
+      if (printAngle) printAngle.textContent = `${data.optimalAngle} (${data.angleTolerance || '±2°'})`;
+      if (printDepth) printDepth.textContent = `${metrics.channelDepth} mm (Traverse full tissue thickness)`;
+      if (printThickness) {
+        var tRange = data.tissueThicknessRange || [4.0, 8.0, 5.0];
+        printThickness.textContent = `${tRange[0]} - ${tRange[1]} mm (Typical: ${tRange[2]} mm | Sized: ${metrics.measuredThickness} mm)`;
+      }
+      if (printJewelry) {
+        var jName = curOpt ? curOpt.name : data.jewelryType;
+        var jG = curOpt ? curOpt.gauge : data.jewelryGauge;
+        var jL = curOpt ? curOpt.length : data.jewelryLength;
+        printJewelry.textContent = `${jG} / ${jL} (${jName})`;
+      }
+      if (printDownsize) {
+        printDownsize.textContent = data.downsizeTime || '';
+      }
+
+      // Fill Anatomical Clearance & Guidance
+      if (printClearance) {
+        printClearance.innerHTML = `<strong>Clearance Rationale:</strong> ${data.whyThisAngle} <br><strong>Off-Axis Hazard:</strong> ${data.badAngleConsequence}`;
+      }
+      if (printTechniqueSummary) {
+        printTechniqueSummary.innerHTML = `<strong>Technique Guidance:</strong> Stabilize tissue plane with sterile ring-closing forceps or freehand technique. Ensure needle axis maintains strict 90° normal vector through both epidermal boundaries. Verify exit mark visualization prior to needle advancement.`;
+      }
+
+      // Fill Refusal Criteria
+      if (printRefusal) {
+        printRefusal.innerHTML = data.refuse || 'Refuse procedure if local infection, active dermatitis, insufficient anatomical tissue ridge, or keloid predisposition is present.';
+      }
+
+      // Fill Material Protocols & Care
+      if (printHouseNotes) {
+        printHouseNotes.innerHTML = '<strong>' + tr('print.materials_label', null, 'Initial jewelry materials') + ':</strong> ' + tr('print.materials_text', null, 'implant-grade titanium (ASTM F136 or F67), implant-grade steel (ASTM F138), solid 14k gold or higher, niobium, or BioFlex® (medical-grade PP-R). Internally threaded or threadless, with a polished finish.');
+      }
+      if (printCareNotes) {
+        printCareNotes.innerHTML = '<strong>' + tr('print.aftercare_label', null, 'Aftercare') + ':</strong> ' + tr('print.aftercare_text', null, 'follow the studio aftercare sheet. A personalised schedule: poliinternational.com/aftercare-schedule-generator/');
+      }
+
+      // Open Print Dialog
+      window.print();
+    }
+
+    // -------------------------------------------------------------
+    // Select Piercing Controller
+    // -------------------------------------------------------------
+    function selectPiercing(key, scrollIntoView) {
+      stopSweepAnimation();
+      if (!piercingData[key]) key = 'earlobe';
+      activePiercingKey = key;
+      activeJewelryOptionId = null; // Reset to default initial jewelry
+      saveWorkspaceState();
+
+      var data = piercingData[key];
+      var thicknessRange = data.tissueThicknessRange || [3.0, 8.0, 5.0];
+      currentMeasuredThickness = thicknessRange[2]; // Set typical thickness
+      currentVisualizerAngle = data.optimalDegrees || 90;
+
+      // Reveal Details Container
+      if (piercingDetails) {
+        piercingDetails.removeAttribute('hidden');
+      }
+
+      // Update Header & Baseline Specs
+      if (piercingName) piercingName.textContent = data.name;
+      updateBaselineSpecs();
+
+      // Update Why This Angle
+      if (whyAngleClearanceContent) {
+        whyAngleClearanceContent.innerHTML = `<p>${data.whyThisAngle}</p>`;
+      }
+      if (badAngleHazardContent) {
+        badAngleHazardContent.innerHTML = `<p>${data.badAngleConsequence}</p>`;
+      }
+
+      // Update Narrative Sections
+      if (positioningContent) positioningContent.innerHTML = data.positioning || '<p>Anatomical positioning guidelines available.</p>';
+      if (techniqueContent) techniqueContent.innerHTML = '<p><strong>' + tr('guide.technique_label', null, 'Technique') + ':</strong> ' + tr('guide.technique_text', { angle: data.optimalAngle }, 'Mark the entry and exit points and confirm both with the client. Support the tissue, then keep the needle on the angle for this placement ({angle}) from entry to exit.') + '</p>';
+      if (pitfallsContent) pitfallsContent.innerHTML = '<p><strong>' + tr('guide.pitfall_label', null, 'Common pitfall') + ':</strong> ' + tr('guide.pitfall_text', null, 'The needle drifting as the tissue drags on it. Check that the exit mark is still in line before pushing through.') + '</p>';
+      if (refusalContent) refusalContent.innerHTML = data.refuse || '<p>Refuse procedure if local infection, keloids, or severe anatomical abnormalities are present.</p>';
+
+      // Update Thickness Slider Constraints
+      if (caliperThicknessSlider) {
+        caliperThicknessSlider.min = thicknessRange[0];
+        caliperThicknessSlider.max = thicknessRange[1];
+        caliperThicknessSlider.step = isFineTuneMode ? 0.1 : 0.5;
+        caliperThicknessSlider.value = currentMeasuredThickness;
+      }
+      if (caliperPrecisionInput) {
+        caliperPrecisionInput.min = thicknessRange[0];
+        caliperPrecisionInput.max = thicknessRange[1];
+        caliperPrecisionInput.value = currentMeasuredThickness.toFixed(1);
+      }
+
+      // Populate Thickness Presets
+      if (thicknessPresetContainer) {
+        thicknessPresetContainer.innerHTML = `
+          <button type="button" class="v2-preset-pill" data-thickness="${thicknessRange[0]}">
+            ${tr('ui.thin', null, 'Thin')} (${formatMm(thicknessRange[0])})
+          </button>
+          <button type="button" class="v2-preset-pill active" data-thickness="${thicknessRange[2]}">
+            ${tr('ui.typical', null, 'Typical')} (${formatMm(thicknessRange[2])})
+          </button>
+          <button type="button" class="v2-preset-pill" data-thickness="${thicknessRange[1]}">
+            ${tr('ui.thick', null, 'Thick')} (${formatMm(thicknessRange[1])})
+          </button>
+        `;
+        var tPills = thicknessPresetContainer.querySelectorAll('.v2-preset-pill');
+        tPills.forEach(function (pill) {
+          pill.addEventListener('click', function () {
+            currentMeasuredThickness = parseFloat(this.getAttribute('data-thickness'));
+            updateVisualizerAndCalculations();
+          });
+        });
+      }
+
+      // Highlight Active Piercing Button
+      piercingButtons.forEach(function (btn) {
+        if (btn.getAttribute('data-piercing') === key) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Update Recent Piercings Tracking
+      updateRecentPiercingsList(key);
+
+      // Load Session Professional Notes for this Piercing
+      loadProfessionalNotes(key);
+
+      // Synchronize All Interactive Modules
+      updateStudioPreferenceStatus();
+      updateVisualizerAndCalculations();
+      updateJewelryUI();
+      updateErrorModeUI('optimal');
+
+      // Synchronize 3D Human Anatomy Model if initialized
+      if (window.Anatomy3DExplorer && typeof window.Anatomy3DExplorer.syncActivePiercing === 'function') {
+        window.Anatomy3DExplorer.syncActivePiercing(key);
+      }
+
+      if (scrollIntoView && piercingDetails) {
         piercingDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    }
+
+    // -------------------------------------------------------------
+    // Recent Piercings Management Helper Delegating to Modules
+    // -------------------------------------------------------------
+    function updateRecentPiercingsList(currentKey) {
+      if (!currentKey || !piercingData[currentKey]) return;
+
+      if (storage.updateRecentPiercings) {
+        recentPiercings = storage.updateRecentPiercings(recentPiercings, currentKey, piercingData, 5);
+      } else {
+        recentPiercings = recentPiercings.filter(function (k) {
+          return k !== currentKey && piercingData[k];
+        });
+        recentPiercings.unshift(currentKey);
+        if (recentPiercings.length > 5) {
+          recentPiercings = recentPiercings.slice(0, 5);
+        }
+      }
+
+      saveWorkspaceState();
+      renderRecentPiercingsChips();
+    }
+
+    function renderRecentPiercingsChips() {
+      if (uiController.renderRecentPiercingsChips) {
+        uiController.renderRecentPiercingsChips(
+          recentPiercingsContainer,
+          recentPiercingsList,
+          recentPiercings,
+          activePiercingKey,
+          isCompareMode,
+          piercingData,
+          function (key) {
+            if (isCompareMode) {
+              setCompareMode(false, false);
+            }
+            selectPiercing(key, true);
+          }
+        );
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Professional Notes (Session Storage) Logic Delegating to Storage Module
+    // -------------------------------------------------------------
+    function getNotesSessionKey(key) {
+      return storage.getNotesSessionKey ? storage.getNotesSessionKey(key) : `poli_piercing_notes_${key}`;
+    }
+
+    function loadProfessionalNotes(key) {
+      if (!professionalNotesArea) return;
+      var savedNote = storage.loadProfessionalNotes ? storage.loadProfessionalNotes(key) : '';
+
+      professionalNotesArea.value = savedNote;
+      if (notesSaveStatus) {
+        if (savedNote.trim().length > 0) {
+          notesSaveStatus.textContent = window.translate ? window.translate('guide.notes_loaded', null, 'Notes loaded for this session') : 'Notes loaded for this session';
+          notesSaveStatus.className = 'notes-status-text notes-status--saved';
+        } else {
+          notesSaveStatus.textContent = window.translate ? window.translate('guide.notes_none', null, 'No notes recorded for this piercing') : 'No notes recorded for this piercing';
+          notesSaveStatus.className = 'notes-status-text';
+        }
+      }
+    }
+
+    function saveProfessionalNotes(key, text) {
+      if (storage.saveProfessionalNotes) {
+        storage.saveProfessionalNotes(key, text);
+      }
+      if (notesSaveStatus) {
+        if (text && text.trim().length > 0) {
+          notesSaveStatus.textContent = window.translate ? window.translate('guide.notes_saved', null, 'Saved to session storage') : 'Saved to session storage';
+          notesSaveStatus.className = 'notes-status-text notes-status--saved';
+        } else {
+          notesSaveStatus.textContent = window.translate ? window.translate('guide.notes_cleared', null, 'Note cleared') : 'Note cleared';
+          notesSaveStatus.className = 'notes-status-text';
+        }
+      }
+    }
+
+    if (professionalNotesArea) {
+      professionalNotesArea.addEventListener('input', function () {
+        saveProfessionalNotes(activePiercingKey, this.value);
+      });
+    }
+
+    if (clearNotesBtn) {
+      clearNotesBtn.addEventListener('click', function () {
+        if (professionalNotesArea) {
+          professionalNotesArea.value = '';
+          saveProfessionalNotes(activePiercingKey, '');
+          professionalNotesArea.focus();
+        }
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Reset All Defaults Helper
+    // -------------------------------------------------------------
+    function resetAllWorkspaceDefaults() {
+      if (storage.resetAllWorkspaceDefaults) {
+        storage.resetAllWorkspaceDefaults();
+      }
+
+      // Reset runtime memory state variables
+      activePiercingKey = 'earlobe';
+      currentUnit = 'metric';
+      isCompareMode = false;
+      comparePiercingKeyA = 'earlobe';
+      comparePiercingKeyB = 'helix';
+      recentPiercings = ['earlobe'];
+      currentVisualizerAngle = 90;
+      currentMeasuredThickness = 5.0;
+      isFineTuneMode = false;
+
+      if (caliperFineTuneBar) caliperFineTuneBar.style.display = 'none';
+      if (toggleFineTuneBtn) {
+        toggleFineTuneBtn.classList.remove('active');
+        toggleFineTuneBtn.setAttribute('aria-pressed', 'false');
+        toggleFineTuneBtn.innerHTML = '🔬 Fine-Tune (0.1mm)';
+      }
+
+      // Reset symmetry controls to clinical defaults
+      symOverlays.landmarks = true;
+      symOverlays.caliper = true;
+      symOverlays.targets = true;
+
+      if (symmetryPairSelect) symmetryPairSelect.value = 'lobes';
+
+      if (symTabLandmarks && symTabSimulator) {
+        symTabLandmarks.classList.add('active');
+        symTabLandmarks.setAttribute('aria-selected', 'true');
+        symTabSimulator.classList.remove('active');
+        symTabSimulator.setAttribute('aria-selected', 'false');
+        if (symLandmarkPanel) symLandmarkPanel.style.display = 'block';
+        if (symSimulatorPanel) symSimulatorPanel.style.display = 'none';
+      }
+
+      if (symToggleLandmarksBtn) symToggleLandmarksBtn.classList.add('active');
+      if (symToggleCaliperBtn) symToggleCaliperBtn.classList.add('active');
+      if (symToggleTargetsBtn) symToggleTargetsBtn.classList.add('active');
+
+      // Update unit UI and compare workspace
+      updateUnitUI();
+      if (compareWorkspace) compareWorkspace.hidden = true;
+      if (compareModeToggleBtn) {
+        compareModeToggleBtn.classList.remove('active');
+        compareModeToggleBtn.setAttribute('aria-pressed', 'false');
+        if (compareModeBtnText) compareModeBtnText.textContent = window.translate ? window.translate('guide.compare_mode', null, 'Compare Mode') : 'Compare Mode';
+      }
+
+      // Reset search filter
+      if (piercingSearchInput) {
+        piercingSearchInput.value = '';
+        var searchEvent = new Event('input', { bubbles: true });
+        piercingSearchInput.dispatchEvent(searchEvent);
+      }
+
+      // Activate baseline piercing
+      selectPiercing('earlobe', true);
+      renderRecentPiercingsChips();
+      updateSymmetryLandmarkUI();
+      updateSymmetryUI();
+      saveWorkspaceState();
+
+      // Visual feedback on Reset All button
+      if (resetAllBtn) {
+        var origHtml = resetAllBtn.innerHTML;
+        resetAllBtn.innerHTML = '<span class="reset-icon">✅</span> <span class="reset-text">Reset Done</span>';
+        setTimeout(function () {
+          resetAllBtn.innerHTML = origHtml;
+        }, 1500);
+      }
+    }
+
+    if (resetAllBtn) {
+      resetAllBtn.addEventListener('click', resetAllWorkspaceDefaults);
+    }
+
+    // -------------------------------------------------------------
+    // Event Listeners Wiring
+    // -------------------------------------------------------------
+
+    // Studio House Standards Preferences Controls
+    if (openStudioPrefModalBtn) {
+      openStudioPrefModalBtn.addEventListener('click', openStudioPreferenceModal);
+    }
+    if (closeStudioPrefModalBtn) {
+      closeStudioPrefModalBtn.addEventListener('click', closeStudioPreferenceModal);
+    }
+    if (cancelStudioPrefBtn) {
+      cancelStudioPrefBtn.addEventListener('click', closeStudioPreferenceModal);
+    }
+    if (studioPrefModal) {
+      studioPrefModal.addEventListener('click', function (e) {
+        if (e.target === studioPrefModal) {
+          closeStudioPreferenceModal();
+        }
+      });
+    }
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && studioPrefModal && studioPrefModal.style.display === 'flex') {
+        closeStudioPreferenceModal();
+      }
     });
-  });
-});
+    if (studioPrefForm) {
+      studioPrefForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var gaugeVal = houseGaugeSelect ? houseGaugeSelect.value : '16G';
+        var jewelryTypeVal = houseJewelryTypeSelect ? houseJewelryTypeSelect.value : '';
+        var notesVal = houseNotesInput ? houseNotesInput.value.trim() : '';
+
+        saveStudioPreference(activePiercingKey, {
+          gauge: gaugeVal,
+          jewelryType: jewelryTypeVal,
+          notes: notesVal
+        });
+
+
+        closeStudioPreferenceModal();
+        updateStudioPreferenceStatus();
+        updateVisualizerAndCalculations();
+        updateBaselineSpecs();
+        updateJewelryUI();
+      });
+    }
+    if (resetStudioPrefBtn) {
+      resetStudioPrefBtn.addEventListener('click', function () {
+        resetStudioPreference(activePiercingKey);
+        updateStudioPreferenceStatus();
+        updateVisualizerAndCalculations();
+        updateBaselineSpecs();
+        updateJewelryUI();
+      });
+    }
+
+
+    // Unit System Toggles
+    if (unitToggleBtn) {
+      unitToggleBtn.addEventListener('click', toggleUnitSystem);
+    }
+    if (unitToggleQuickBtn) {
+      unitToggleQuickBtn.addEventListener('click', toggleUnitSystem);
+    }
+
+    // Compare Mode Controls
+    if (compareModeToggleBtn) {
+      compareModeToggleBtn.addEventListener('click', function () {
+        setCompareMode(!isCompareMode, true);
+      });
+    }
+    if (exitCompareBtn) {
+      exitCompareBtn.addEventListener('click', function () {
+        setCompareMode(false, true);
+      });
+    }
+    if (comparePrintBtn) {
+      comparePrintBtn.addEventListener('click', generateAndPrintComparisonSheet);
+    }
+
+    if (compareSelectA) {
+      compareSelectA.addEventListener('change', function () {
+        comparePiercingKeyA = this.value;
+        updateCompareWorkspace();
+        saveWorkspaceState();
+      });
+    }
+
+    if (compareSelectB) {
+      compareSelectB.addEventListener('change', function () {
+        comparePiercingKeyB = this.value;
+        updateCompareWorkspace();
+        saveWorkspaceState();
+      });
+    }
+
+    comparePresetPills.forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        var pairStr = this.getAttribute('data-pair');
+        if (!pairStr) return;
+        var parts = pairStr.split(',');
+        if (parts.length === 2) {
+          comparePiercingKeyA = parts[0];
+          comparePiercingKeyB = parts[1];
+          if (compareSelectA) compareSelectA.value = comparePiercingKeyA;
+          if (compareSelectB) compareSelectB.value = comparePiercingKeyB;
+          updateCompareWorkspace();
+          saveWorkspaceState();
+        }
+      });
+    });
+
+    // Piercing Button Click
+    piercingButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = this.getAttribute('data-piercing');
+        if (isCompareMode) {
+          setCompareMode(false, false);
+        }
+        selectPiercing(key, true);
+      });
+    });
+
+    // Real-time Search Input Filter
+    if (piercingSearchInput) {
+      piercingSearchInput.addEventListener('input', function () {
+        var query = this.value.toLowerCase().trim();
+        piercingButtons.forEach(function (btn) {
+          var key = btn.getAttribute('data-piercing');
+          var data = piercingData[key];
+          if (!data) return;
+          var name = (data.name || '').toLowerCase();
+          var category = (data.category || '').toLowerCase();
+          var tissue = (data.tissueType || '').toLowerCase();
+          var match = name.includes(query) || category.includes(query) || tissue.includes(query) || key.includes(query);
+          btn.style.display = match ? '' : 'none';
+        });
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Interactive Dynamic Angle Dragging Engine
+    // -------------------------------------------------------------
+    var isDraggingAngle = false;
+
+    function getAngleFromPointerEvent(e, container) {
+      if (!container) return currentVisualizerAngle;
+      var rect = container.getBoundingClientRect();
+      var clientX = e.clientX;
+      var clientY = e.clientY;
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else if (e.changedTouches && e.changedTouches.length > 0) {
+        clientX = e.changedTouches[0].clientX;
+        clientY = e.changedTouches[0].clientY;
+      }
+
+      // Normalized coordinates mapped to SVG viewBox (360 x 300)
+      var svgX = ((clientX - rect.left) / rect.width) * 360;
+      var svgY = ((clientY - rect.top) / rect.height) * 300;
+
+      var centerX = 180;
+      var centerY = 140;
+      var dx = svgX - centerX;
+      var dy = svgY - centerY;
+
+      // Handle both top anterior handle and bottom posterior handle dragging
+      var angleRad;
+      if (dy < 0) {
+        angleRad = Math.atan2(-dy, -dx);
+      } else {
+        angleRad = Math.atan2(dy, dx);
+      }
+
+      var deg = Math.round((angleRad * 180) / Math.PI);
+      if (deg < 30) deg = 30;
+      if (deg > 150) deg = 150;
+      return deg;
+    }
+
+    function handleAngleDragStart(e) {
+      if (e.type === 'touchstart' || e.type === 'pointerdown') {
+        if (e.cancelable && e.type !== 'pointerdown') e.preventDefault();
+      }
+      isDraggingAngle = true;
+      if (v2SvgCanvasContainer) {
+        v2SvgCanvasContainer.classList.add('is-dragging');
+        if (v2SvgCanvasContainer.setPointerCapture && e.pointerId) {
+          try { v2SvgCanvasContainer.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+      }
+      var newAngle = getAngleFromPointerEvent(e, v2SvgCanvasContainer);
+      if (newAngle !== currentVisualizerAngle) {
+        currentVisualizerAngle = newAngle;
+        updateVisualizerAndCalculations();
+      }
+    }
+
+    function handleAngleDragMove(e) {
+      if (!isDraggingAngle) return;
+      if (e.cancelable) e.preventDefault();
+      var newAngle = getAngleFromPointerEvent(e, v2SvgCanvasContainer);
+      if (newAngle !== currentVisualizerAngle) {
+        currentVisualizerAngle = newAngle;
+        updateVisualizerAndCalculations();
+      }
+    }
+
+    function handleAngleDragEnd(e) {
+      if (!isDraggingAngle) return;
+      isDraggingAngle = false;
+      if (v2SvgCanvasContainer) {
+        v2SvgCanvasContainer.classList.remove('is-dragging');
+        if (v2SvgCanvasContainer.releasePointerCapture && e.pointerId) {
+          try { v2SvgCanvasContainer.releasePointerCapture(e.pointerId); } catch (err) {}
+        }
+      }
+      saveWorkspaceState();
+    }
+
+    // Attach Pointer and Touch Listeners to Dynamic Visualizer Canvas
+    if (v2SvgCanvasContainer) {
+      v2SvgCanvasContainer.addEventListener('pointerdown', handleAngleDragStart);
+      window.addEventListener('pointermove', handleAngleDragMove);
+      window.addEventListener('pointerup', handleAngleDragEnd);
+      window.addEventListener('pointercancel', handleAngleDragEnd);
+
+      v2SvgCanvasContainer.addEventListener('touchstart', handleAngleDragStart, { passive: false });
+      window.addEventListener('touchmove', handleAngleDragMove, { passive: false });
+      window.addEventListener('touchend', handleAngleDragEnd);
+      window.addEventListener('touchcancel', handleAngleDragEnd);
+    }
+
+    // -------------------------------------------------------------
+    // Diagram Export Handlers (SVG & PNG for Client Consultation Notes)
+    // -------------------------------------------------------------
+    function downloadAngleVisualizerSvg() {
+      if (!v2SvgCanvasContainer) return;
+      var svgEl = v2SvgCanvasContainer.querySelector('svg');
+      if (!svgEl) return;
+
+      var serializer = new XMLSerializer();
+      var svgString = serializer.serializeToString(svgEl);
+      var blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = `poli-${activePiercingKey}-${currentVisualizerAngle}deg-diagram.svg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      if (downloadAngleDiagramSvgBtn) {
+        var orig = downloadAngleDiagramSvgBtn.innerHTML;
+        downloadAngleDiagramSvgBtn.innerHTML = '✅ Saved SVG';
+        setTimeout(function () { downloadAngleDiagramSvgBtn.innerHTML = orig; }, 1500);
+      }
+    }
+
+    function downloadAngleVisualizerPng() {
+      if (!v2SvgCanvasContainer) return;
+      var svgEl = v2SvgCanvasContainer.querySelector('svg');
+      if (!svgEl) return;
+
+      var serializer = new XMLSerializer();
+      var svgString = serializer.serializeToString(svgEl);
+      var svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      var url = URL.createObjectURL(svgBlob);
+
+      var img = new Image();
+      img.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = 960;
+        canvas.height = 780;
+        var ctx = canvas.getContext('2d');
+
+        // Dark slate neutral canvas background for consultation notes
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Header title for client notes
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
+        var pData = piercingData[activePiercingKey] || piercingData['earlobe'];
+        ctx.fillText(`POLI INTERNATIONAL - ${pData.name.toUpperCase()} (${currentVisualizerAngle}°)`, 40, 45);
+
+        // Draw scaled SVG diagram onto canvas
+        ctx.drawImage(img, 40, 60, 880, 680);
+        URL.revokeObjectURL(url);
+
+        canvas.toBlob(function (blob) {
+          if (!blob) return;
+          var pngUrl = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = pngUrl;
+          a.download = `poli-${activePiercingKey}-${currentVisualizerAngle}deg-diagram.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(pngUrl);
+
+          if (downloadAngleDiagramPngBtn) {
+            var orig = downloadAngleDiagramPngBtn.innerHTML;
+            downloadAngleDiagramPngBtn.innerHTML = '✅ Saved PNG';
+            setTimeout(function () { downloadAngleDiagramPngBtn.innerHTML = orig; }, 1500);
+          }
+        }, 'image/png');
+      };
+      img.src = url;
+    }
+
+    if (downloadAngleDiagramSvgBtn) {
+      downloadAngleDiagramSvgBtn.addEventListener('click', downloadAngleVisualizerSvg);
+    }
+    if (downloadAngleDiagramPngBtn) {
+      downloadAngleDiagramPngBtn.addEventListener('click', downloadAngleVisualizerPng);
+    }
+
+    // -------------------------------------------------------------
+    // Smooth Dynamic Angle Animation & Sweep Stress Demonstration
+    // -------------------------------------------------------------
+    var angleAnimationId = null;
+    var isAngleSweepRunning = false;
+
+    function stopAngleAnimation() {
+      if (angleAnimationId) {
+        cancelAnimationFrame(angleAnimationId);
+        angleAnimationId = null;
+      }
+    }
+
+    function stopSweepAnimation() {
+      isAngleSweepRunning = false;
+      stopAngleAnimation();
+      if (visualizerAnimateAngleBtn) {
+        visualizerAnimateAngleBtn.classList.remove('active');
+      }
+      if (visualizerAnimateIcon) {
+        visualizerAnimateIcon.textContent = '▶';
+      }
+      if (visualizerAnimateText) {
+        var t = window.translate || function (k, p, d) { return d; };
+        visualizerAnimateText.textContent = t('visualizer.animate_sweep_label', null, 'Animate Shift');
+      }
+    }
+
+    function smoothAnimateAngleTo(targetAngle, duration, onComplete) {
+      stopAngleAnimation();
+      var startAngle = currentVisualizerAngle;
+      var diff = targetAngle - startAngle;
+      if (Math.abs(diff) < 0.1) {
+        currentVisualizerAngle = targetAngle;
+        updateVisualizerAndCalculations();
+        if (typeof onComplete === 'function') onComplete();
+        return;
+      }
+      var startTime = performance.now();
+      var animDuration = duration || 450;
+
+      function step(now) {
+        var elapsed = now - startTime;
+        var progress = Math.min(1, elapsed / animDuration);
+        // easeInOutQuad
+        var ease = progress < 0.5
+          ? 2 * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        currentVisualizerAngle = Math.round(startAngle + diff * ease);
+        updateVisualizerAndCalculations();
+
+        if (progress < 1) {
+          angleAnimationId = requestAnimationFrame(step);
+        } else {
+          currentVisualizerAngle = targetAngle;
+          updateVisualizerAndCalculations();
+          angleAnimationId = null;
+          if (typeof onComplete === 'function') onComplete();
+        }
+      }
+
+      angleAnimationId = requestAnimationFrame(step);
+    }
+
+    function startSweepAnimation() {
+      isAngleSweepRunning = true;
+      if (visualizerAnimateAngleBtn) {
+        visualizerAnimateAngleBtn.classList.add('active');
+      }
+      if (visualizerAnimateIcon) {
+        visualizerAnimateIcon.textContent = '⏸';
+      }
+
+      // Sweep keyframe sequence: 75° (-15°) -> 105° (+15°) -> 90° (Flush)
+      var sequence = [75, 105, 90];
+      var seqIndex = 0;
+
+      function nextStep() {
+        if (!isAngleSweepRunning) return;
+        var target = sequence[seqIndex];
+        seqIndex = (seqIndex + 1) % sequence.length;
+        smoothAnimateAngleTo(target, 750, function () {
+          if (!isAngleSweepRunning) return;
+          setTimeout(function () {
+            if (isAngleSweepRunning) nextStep();
+          }, 350);
+        });
+      }
+
+      nextStep();
+    }
+
+    // -------------------------------------------------------------
+    // Reset Visualizer Action
+    // -------------------------------------------------------------
+    function resetAngleVisualizer() {
+      stopSweepAnimation();
+      activeJewelryOptionId = null;
+      smoothAnimateAngleTo(90, 400, function () {
+        updateJewelryUI();
+        saveWorkspaceState();
+      });
+
+      if (resetAngleVisualizerBtn) {
+        var orig = resetAngleVisualizerBtn.innerHTML;
+        resetAngleVisualizerBtn.innerHTML = '✅ Reset Done';
+        setTimeout(function () { resetAngleVisualizerBtn.innerHTML = orig; }, 1200);
+      }
+    }
+
+    if (resetAngleVisualizerBtn) {
+      resetAngleVisualizerBtn.addEventListener('click', resetAngleVisualizer);
+    }
+
+    // -------------------------------------------------------------
+    // Sub-Millimeter (0.1mm) Fine-Tune Mode Logic
+    // -------------------------------------------------------------
+    function toggleFineTuneMode() {
+      isFineTuneMode = !isFineTuneMode;
+      if (caliperFineTuneBar) {
+        caliperFineTuneBar.style.display = isFineTuneMode ? 'flex' : 'none';
+      }
+      if (toggleFineTuneBtn) {
+        if (isFineTuneMode) {
+          toggleFineTuneBtn.classList.add('active');
+          toggleFineTuneBtn.setAttribute('aria-pressed', 'true');
+          toggleFineTuneBtn.innerHTML = '🔬 Fine-Tune: ON (0.1mm)';
+        } else {
+          toggleFineTuneBtn.classList.remove('active');
+          toggleFineTuneBtn.setAttribute('aria-pressed', 'false');
+          toggleFineTuneBtn.innerHTML = '🔬 Fine-Tune (0.1mm)';
+        }
+      }
+      if (caliperThicknessSlider) {
+        caliperThicknessSlider.step = isFineTuneMode ? '0.1' : '0.5';
+      }
+      if (caliperPrecisionInput) {
+        caliperPrecisionInput.value = currentMeasuredThickness.toFixed(1);
+      }
+    }
+
+    function adjustCaliperThickness(delta) {
+      var pData = piercingData[activePiercingKey] || piercingData['earlobe'];
+      var tRange = pData.tissueThicknessRange || [2.0, 16.0, 6.0];
+      var min = tRange[0];
+      var max = tRange[1];
+
+      var newThickness = Math.round((currentMeasuredThickness + delta) * 10) / 10;
+      if (newThickness < min) newThickness = min;
+      if (newThickness > max) newThickness = max;
+
+      currentMeasuredThickness = newThickness;
+      if (caliperPrecisionInput) {
+        caliperPrecisionInput.value = currentMeasuredThickness.toFixed(1);
+      }
+      updateVisualizerAndCalculations();
+      saveWorkspaceState();
+    }
+
+    if (toggleFineTuneBtn) {
+      toggleFineTuneBtn.addEventListener('click', toggleFineTuneMode);
+    }
+    if (stepperMinus05Btn) {
+      stepperMinus05Btn.addEventListener('click', function () { adjustCaliperThickness(-0.5); });
+    }
+    if (stepperMinus01Btn) {
+      stepperMinus01Btn.addEventListener('click', function () { adjustCaliperThickness(-0.1); });
+    }
+    if (stepperPlus01Btn) {
+      stepperPlus01Btn.addEventListener('click', function () { adjustCaliperThickness(0.1); });
+    }
+    if (stepperPlus05Btn) {
+      stepperPlus05Btn.addEventListener('click', function () { adjustCaliperThickness(0.5); });
+    }
+    if (caliperPrecisionInput) {
+      caliperPrecisionInput.addEventListener('change', function () {
+        var val = parseFloat(this.value);
+        if (!isNaN(val)) {
+          var pData = piercingData[activePiercingKey] || piercingData['earlobe'];
+          var tRange = pData.tissueThicknessRange || [2.0, 16.0, 6.0];
+          if (val < tRange[0]) val = tRange[0];
+          if (val > tRange[1]) val = tRange[1];
+          currentMeasuredThickness = Math.round(val * 10) / 10;
+          this.value = currentMeasuredThickness.toFixed(1);
+          updateVisualizerAndCalculations();
+          saveWorkspaceState();
+        }
+      });
+    }
+
+    // Angle Slider Live Input
+    if (angleRangeSlider) {
+      angleRangeSlider.addEventListener('input', function () {
+        stopSweepAnimation();
+        stopAngleAnimation();
+        currentVisualizerAngle = parseInt(this.value, 10);
+        updateVisualizerAndCalculations();
+      });
+    }
+
+    // Angle Preset Pills Click
+    anglePresetBtns.forEach(function (pill) {
+      if (pill.id === 'visualizerAnimateAngleBtn') return;
+      pill.addEventListener('click', function () {
+        stopSweepAnimation();
+        var offset = parseInt(this.getAttribute('data-angle-offset'), 10);
+        smoothAnimateAngleTo(90 + offset, 450);
+      });
+    });
+
+    // Angle Sweep Demonstration Button Click
+    if (visualizerAnimateAngleBtn) {
+      visualizerAnimateAngleBtn.addEventListener('click', function () {
+        if (isAngleSweepRunning) {
+          stopSweepAnimation();
+        } else {
+          startSweepAnimation();
+        }
+      });
+    }
+
+    // Caliper Thickness Slider Live Input
+    if (caliperThicknessSlider) {
+      caliperThicknessSlider.addEventListener('input', function () {
+        currentMeasuredThickness = parseFloat(this.value);
+        updateVisualizerAndCalculations();
+      });
+    }
+
+    // Error Mode Tabs Click
+    errorTabBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var mode = this.getAttribute('data-error-mode');
+        updateErrorModeUI(mode);
+        try {
+          localStorage.setItem('poli_piercing_error_mode', mode);
+        } catch (e) {}
+      });
+    });
+
+    // Symmetry Tabs & Mode Switching
+    if (symTabLandmarks && symTabSimulator) {
+      symTabLandmarks.addEventListener('click', function () {
+        symTabLandmarks.classList.add('active');
+        symTabLandmarks.setAttribute('aria-selected', 'true');
+        symTabSimulator.classList.remove('active');
+        symTabSimulator.setAttribute('aria-selected', 'false');
+
+        if (symLandmarkPanel) symLandmarkPanel.style.display = 'block';
+        if (symSimulatorPanel) symSimulatorPanel.style.display = 'none';
+
+        updateSymmetryLandmarkUI();
+        saveWorkspaceState();
+      });
+
+      symTabSimulator.addEventListener('click', function () {
+        symTabSimulator.classList.add('active');
+        symTabSimulator.setAttribute('aria-selected', 'true');
+        symTabLandmarks.classList.remove('active');
+        symTabLandmarks.setAttribute('aria-selected', 'false');
+
+        if (symSimulatorPanel) symSimulatorPanel.style.display = 'block';
+        if (symLandmarkPanel) symLandmarkPanel.style.display = 'none';
+
+        updateSymmetryUI();
+        saveWorkspaceState();
+      });
+    }
+
+    // Symmetry Visualizer Overlay Toggles
+    if (symToggleLandmarksBtn) {
+      symToggleLandmarksBtn.addEventListener('click', function () {
+        symOverlays.landmarks = !symOverlays.landmarks;
+        if (symOverlays.landmarks) {
+          symToggleLandmarksBtn.classList.add('active');
+        } else {
+          symToggleLandmarksBtn.classList.remove('active');
+        }
+        updateSymmetryLandmarkUI();
+      });
+    }
+
+    if (symToggleCaliperBtn) {
+      symToggleCaliperBtn.addEventListener('click', function () {
+        symOverlays.caliper = !symOverlays.caliper;
+        if (symOverlays.caliper) {
+          symToggleCaliperBtn.classList.add('active');
+        } else {
+          symToggleCaliperBtn.classList.remove('active');
+        }
+        updateSymmetryLandmarkUI();
+      });
+    }
+
+    if (symToggleTargetsBtn) {
+      symToggleTargetsBtn.addEventListener('click', function () {
+        symOverlays.targets = !symOverlays.targets;
+        if (symOverlays.targets) {
+          symToggleTargetsBtn.classList.add('active');
+        } else {
+          symToggleTargetsBtn.classList.remove('active');
+        }
+        updateSymmetryLandmarkUI();
+      });
+    }
+
+    // Symmetry Caliper Controls Listeners
+    if (symmetryPairSelect) {
+      symmetryPairSelect.addEventListener('change', function () {
+        updateSymmetryUI();
+        saveWorkspaceState();
+      });
+    }
+    if (symLeftAngleSlider) {
+      symLeftAngleSlider.addEventListener('input', updateSymmetryUI);
+    }
+    if (symRightAngleSlider) {
+      symRightAngleSlider.addEventListener('input', updateSymmetryUI);
+    }
+    if (symHeightOffsetSlider) {
+      symHeightOffsetSlider.addEventListener('input', updateSymmetryUI);
+    }
+
+    // Copy Clinical Summary Action
+    if (copySummaryBtn) {
+      copySummaryBtn.addEventListener('click', function () {
+        var data = piercingData[activePiercingKey] || piercingData['earlobe'];
+        var metrics = calculateChannelMetrics(activePiercingKey, currentMeasuredThickness, currentVisualizerAngle);
+
+        var summary = `POLI INTERNATIONAL - CLINICAL PIERCING SPECIFICATION
+Placement: ${data.name} (${data.category || 'Body Piercing'})
+Optimal Angle: ${data.optimalAngle} (${data.angleTolerance || '±2°'})
+Measured Tissue Thickness: ${formatMm(metrics.measuredThickness, true)}
+Resulting Channel Depth: ${formatMm(metrics.channelDepth, true)}
+Initial Gauge Standard: ${data.jewelryGauge}
+Tissue Type: ${data.tissueType}
+Healing Timeline: ${data.healingTime}
+Downsize Milestone: ${data.downsizeTime}
+Anatomical Rationale: ${data.whyThisAngle}
+Clinical Risk of Off-Angle: ${data.badAngleConsequence}
+Jewelry length and fit: https://poliinternational.com/jewelry-size-visualizer/
+Reference: Poli International Piercing Angle & Depth Guide`;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(summary).then(function () {
+            var orig = copySummaryBtn.innerHTML;
+            copySummaryBtn.innerHTML = '✅ Copied to Clipboard!';
+            setTimeout(function () { copySummaryBtn.innerHTML = orig; }, 2000);
+          });
+        }
+      });
+    }
+
+    // Print / Download as PDF Actions
+    if (downloadPdfBtn) {
+      downloadPdfBtn.addEventListener('click', generateAndPrintClinicalSheet);
+    }
+    if (print1PageSheetBtn) {
+      print1PageSheetBtn.addEventListener('click', generateAndPrintClinicalSheet);
+    }
+
+    // Download Structured JSON Specification Action
+    function downloadPiercingJson() {
+      var data = piercingData[activePiercingKey] || piercingData['earlobe'];
+      var metrics = calculateChannelMetrics(activePiercingKey, currentMeasuredThickness, currentVisualizerAngle);
+      var currentNote = '';
+      if (professionalNotesArea) {
+        currentNote = professionalNotesArea.value;
+      }
+
+      var exportPayload = {
+        application: "Poli International Piercing Angle & Depth Guide",
+        publisher: "Poli International",
+        version: "2.5.0",
+        exportTimestamp: new Date().toISOString(),
+        piercing: {
+          key: activePiercingKey,
+          name: data.name,
+          category: data.category || 'Body Piercing',
+          tissueType: data.tissueType,
+          optimalAngle: data.optimalAngle,
+          angleTolerance: data.angleTolerance || '±2°',
+          currentSimulatedAngle: currentVisualizerAngle + '°',
+          angleDeviationFromBaseline: (currentVisualizerAngle - 90) + '°'
+        },
+        measurements: {
+          measuredTissueThicknessMm: metrics.measuredThickness,
+          resultingChannelDepthMm: metrics.channelDepth,
+          displayUnit: currentUnit
+        },
+        jewelry: {
+          recommendedGauge: data.jewelryGauge,
+          recommendedType: data.jewelryType,
+          recommendedInitialLength: data.jewelryLength,
+          typicalDownsizeTiming: data.downsizeTime
+        },
+        clinicalGuidance: {
+          anatomicalRationale: data.whyThisAngle,
+          riskOfOffAngle: data.badAngleConsequence,
+          clientPositioning: data.positioning,
+          piercingTechnique: data.technique,
+          anatomicalContraindications: data.refusalCriteria,
+          expectedHealingTimeline: data.healingTime
+        },
+        practitionerNotes: currentNote || null
+      };
+
+      var jsonStr = JSON.stringify(exportPayload, null, 2);
+      var blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = `poli-${activePiercingKey}-specification.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      var btns = [downloadJsonBtn, notesDownloadJsonBtn, mainDownloadJsonBtn];
+      btns.forEach(function (btn) {
+        if (!btn) return;
+        var origHtml = btn.innerHTML;
+        btn.innerHTML = '✅ Exported JSON';
+        setTimeout(function () {
+          btn.innerHTML = origHtml;
+        }, 1800);
+      });
+    }
+
+    if (downloadJsonBtn) {
+      downloadJsonBtn.addEventListener('click', downloadPiercingJson);
+    }
+    if (notesDownloadJsonBtn) {
+      notesDownloadJsonBtn.addEventListener('click', downloadPiercingJson);
+    }
+    if (mainDownloadJsonBtn) {
+      mainDownloadJsonBtn.addEventListener('click', downloadPiercingJson);
+    }
+
+    // Dynamic re-render on language change
+    window.addEventListener('languageChanged', function () {
+      selectPiercing(activePiercingKey, false);
+      populateCompareSelects();
+      if (isCompareMode) {
+        updateCompareWorkspace();
+      }
+      var activeErrorBtn = document.querySelector('.error-tab-btn.active');
+      var curErrorMode = activeErrorBtn ? activeErrorBtn.getAttribute('data-error-mode') : 'optimal';
+      updateErrorModeUI(curErrorMode);
+      updateSymmetryLandmarkUI();
+      updateSymmetryUI();
+      if (window.Anatomy3DExplorer && typeof window.Anatomy3DExplorer.syncActivePiercing === 'function') {
+        window.Anatomy3DExplorer.syncActivePiercing(activePiercingKey);
+      }
+    });
+
+    // Initial Load Execution and State Restoration
+    populateCompareSelects();
+    loadSavedWorkspaceState();
+    updateUnitUI();
+
+    // Initialize 3D Anatomy Model if present
+    if (window.Anatomy3DExplorer && typeof window.Anatomy3DExplorer.init === 'function') {
+      window.Anatomy3DExplorer.init(function (piercingKey) {
+        selectPiercing(piercingKey, true);
+      });
+    }
+
+    try {
+      var savedSymTab = localStorage.getItem('poli_piercing_sym_tab');
+      if (savedSymTab === 'simulator' && symTabSimulator) {
+        symTabSimulator.click();
+      }
+      var savedSymPair = localStorage.getItem('poli_piercing_sym_pair');
+      if (savedSymPair && symmetryPairSelect) {
+        symmetryPairSelect.value = savedSymPair;
+      }
+    } catch (e) {}
+
+    if (isCompareMode) {
+      setCompareMode(true, false);
+    } else {
+      selectPiercing(activePiercingKey, false);
+    }
+
+    updateSymmetryUI();
+
+    // Expose selectPiercing for external components (like Anatomy 3D Explorer)
+    window.selectPiercingGlobal = function (key, scroll) {
+      selectPiercing(key, scroll);
+    };
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
+})();
